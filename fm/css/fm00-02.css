@@ -1,0 +1,120 @@
+body {
+  font-family:arial;
+  padding:10px;
+}
+select.select-preset {
+  font-family:arial;
+  color:#000;
+  overflow: hidden;
+  outline: none;
+  font-size:15px; /*-webkit-small-control;*/
+  webkit-appearance: button;
+  moz-appearance: button;
+  appearance: button;
+  webkit-border-radius: 6px;
+  moz-border-radius: 6px;
+  box-sizing: border-box;
+  webkit-box-sizing: border-box;
+  moz-box-sizing: border-box;
+  background-size: 22px 24px;
+  cursor: pointer;
+  vertical-align: middle;
+  user-select: none; /* CSS3 */
+  moz-user-select: none; /* Firefox */
+  webkit-user-select: none; /* Safari、Chromeなど */
+
+  padding:5px 30px 5px 5px;
+  border-radius:2px;
+  border:0px solid #ddd;
+  margin:3px 3px;
+}
+div.knobs {
+  width:25px; 
+  border-radius:50%; 
+}
+div.knob {
+  width:35px; 
+  border-radius:50%; 
+  background-color:rgba(77, 208, 225, 0.5); /*rgba(255, 255, 255, 0.8);*/
+}
+div#maingain-knob {
+  position:absolute;
+  top:194px; left:458px;
+}
+div#analyser-mod00 {
+  position:absolute;
+  top:47px; left:37px;
+  width:204.5px; height:99px;
+  background-color:rgba(239, 239, 239, 1);
+}
+div#analyser-mod01 {
+  position:absolute;
+  top:47px; left:244px;
+  background-color:rgba(239, 239, 239, 1);
+}
+div#analyser-car00 {
+  position:absolute;
+  top:195px; left:37px;
+  width:204.5px; height:99px;
+  background-color:rgba(239, 239, 239, 1);
+}
+div#analyser-car01 {
+  position:absolute;
+  top:195px; left:244px;
+  width:204.5px; height:99px;
+  background-color:rgba(239, 239, 239, 1);
+}
+
+div#preset {
+  position: absolute;
+  top:10px; right:0px;
+}
+
+div#main-frame {
+  position:relative;
+  background-color:#263238; /*rgba(166, 31, 31, 1);*/
+  width:700px; height:498px;
+  padding:25px;
+  border-radius:10px;
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+div#control-panel {
+  position:relative;
+  left:78px;
+  width:545px; height:343px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}
+div#synth00-controls {
+  position:relative;
+  width:545px; height:310px;
+  background: url("../images/fmsynth01.png") no-repeat left top;
+}
+div#synth00-title {
+  position:relative;
+  width:545px; height:33px;
+  background-color:rgba(0, 172, 193, 1);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  z-index:1;
+}
+div#synth00-frame {
+  position:relative;
+  width:545px; height:310px;
+  background-color:rgba(77, 208, 225, 1); /* #4dd0e1 */
+}
+div#control-panel-top {
+  position:relative;
+  width:669px;
+  padding:5px 15px 20px 15px;
+  z-index:1;
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+div#keyboard-frame {
+  position:relative;
+  width:699px;
+  margin-top:0px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}
+span#midiinput {
+  position:absolute;
+  right:0px;
+}

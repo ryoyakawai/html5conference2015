@@ -1,0 +1,66 @@
+  body{
+    font-family:arial;
+    font-weight:bold;
+    background:url("../images/metal-316803_640.jpg") repeat;
+    color: rgba(180, 180, 180, 0);
+    text-shadow: 1px 1px white, 0px 0px #444;
+  }
+  div#control-panel {
+    position:absolute;
+    top:50px; left:50px;
+  }
+  div#div-button-ps {
+    position:absolute;
+    top:20px; left:20px;
+  }
+  div#div-button-ps-text {
+    position:absolute;
+    top:4px; left:24px;
+  }
+  div#div-button-dl {
+    position:absolute;
+    top:20px; left:185px;
+  }
+  div#div-button-dl-text {
+    position:absolute;
+    top:4px; left:205px;
+  }
+  div#div-button-pitch {
+    position:absolute;
+    top:154px; left:34px;
+  }
+  div#div-button-pitch-text {
+    font-size:12px;
+    position:absolute;
+    top:200px; left:46px;
+  }
+  div#div-button-direction {
+    position:absolute;
+    top:154px; left:200px;
+  }
+  div#div-button-dltype-text {
+    font-size:12px;
+    position:absolute;
+    top:200px; left:213px;
+  }
+  div#div-button-dltime {
+    position:absolute;
+    top:218px; left:193px;
+  }
+  div#div-button-dltime-text {
+    font-size:12px;
+    position:absolute;
+    top:250px; left:197px;
+  }
+  div#div-button-dlgain {
+    position:absolute;
+    top:218px; left:232px;
+  }
+  div#div-button-dlgain-text {
+    font-size:12px;
+    position:absolute;
+    top:250px; left:232px;
+  }
+  .button-size {
+    width:85px; height:128px;
+  }

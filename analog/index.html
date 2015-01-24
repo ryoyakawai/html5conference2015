@@ -1,0 +1,57 @@
+<html>
+  <head>
+    <script src="./bower_components/webcomponentsjs/webcomponents.js"></script>
+    <link rel="import" href="./bower_components/x-webmidi/x-webmidirequestaccess.html">
+    <link rel="import" href="./components/polymer_analyser.html">
+    <link rel="import" href="./bower_components/webaudio-controls/webaudio-controls.html">
+    <link rel="stylesheet" type="text/css" href="./css/osc2-00.css">
+  </head>
+  <body>
+    <x-webmidirequestaccess sysex="true" input="true" output="true"></x-webmidirequestaccess>
+    <div>
+      
+    </div>
+
+    <polymer-analyser id="p-vco00" offsety="20"></polymer-analyser>
+    <polymer-analyser id="p-vco01" offsety="20"></polymer-analyser>
+    <polymer-analyser id="p-vcf00" offsety="20"></polymer-analyser>
+    <polymer-analyser id="p-lfo00" offsety="20"></polymer-analyser>
+    <polymer-analyser id="p-vcf01" offsety="20"></polymer-analyser>
+    <polymer-analyser id="p-mediastream" offsety="20"></polymer-analyser>
+
+    <div id="main-frame">
+      <div id="control-panel-top">
+      <div id="control-panel">
+        <div id="synth00-title">
+          <span id="midiinput">
+            <x-webmidiinput id="input00"></x-webmidiinput>
+            <x-webmidiinput id="input01"></x-webmidiinput>
+            <span>
+        </div>
+        <div id="synth00-frame">
+          <div id="synth00-controls">
+            <div id="lfo0gain-knob" class="knob"><webaudio-knob id="knob-lfo0gain0" src="./images/flatknob3.png" sprites="30" value="1" min="0" max="30" step="0.5" diameter="35"></webaudio-knob></div>
+            <div id="lfo1gain-knob" class="knob"><webaudio-knob id="knob-lfo0gain1" src="./images/flatknob3.png" sprites="30" value="7" min="0" max="30" step="0.5" diameter="35"></webaudio-knob></div>
+            <div id="vco1detune-knob" class="knobs"><webaudio-knob id="knob-vco1detune" src="./images/flatknob3s-blue.png" sprites="30" value="0" min="-100" max="100" step="0.5" diameter="25"></webaudio-knob></div>
+            <div id="modvcf0gain-knob" class="knob"><webaudio-knob id="knob-modvcf0gain" src="./images/flatknob3.png" sprites="30" value="50" min="0" max="1000" step="0.5" diameter="35"></webaudio-knob></div>
+            <div id="lfo0freq-slider"><input id="slider-lfo0freq" type="range" min="0" max="50" step="0.5" value="3" style="width:149px;"></div>
+            <div id="vcf0freq-slider"><input id="slider-vcf0freq" type="range" min="0" max="3000" step="0.5" value="1000"></div>
+            <div id="vcf0q-knob" class="knob"><webaudio-knob id="knob-vcf0q" src="./images/flatknob3.png" sprites="30" value="1" min="0" max="30" step="0.5" diameter="35"></webaudio-knob></div>
+            <div id="vca0gain-knob" class="knob"><webaudio-knob id="knob-vca0gain" src="./images/flatknob3.png" sprites="30" value="0.5" min="0" max="1" step="0.05" diameter="35"></webaudio-knob></div>
+            <div id="analyser-vco00"></div>
+            <div id="analyser-vco01"></div>
+            <div id="analyser-vcf00"></div>
+            <div id="analyser-lfo00"></div>
+            <div id="analyser-vcf01"></div>
+          </div>
+        </div>
+        </div>
+      </div>
+      <div id="keyboard-frame">
+        <webaudio-keyboard id="keyboard" width="699" height="150" min="48" keys="35" style="position:relative;"></webaudio-keyboard>
+      </div>
+    </div>
+
+    <script type="text/javascript" src="js/osc2-00.js"></script>
+  </body>
+</html>

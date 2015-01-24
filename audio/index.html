@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<head>
+  <link rel="stylesheet" type="text/css" href="./css/style.css">
+</head>
+<body>
+  <script src="./bower_components/webcomponentsjs/webcomponents.js"></script>
+  <link rel="import" href="./bower_components/x-webmidi/x-webmidirequestaccess.html">
+  <link rel="import" href="./components/polymer_analyser.html">
+  <link rel="import" href="./bower_components/webaudio-controls/webaudio-controls.html">
+  <x-webmidirequestaccess sysex="true" input="true" output="true"></x-webmidirequestaccess>
+
+  <div id="control-panel">
+    <div id="div-button-ps-text">PitchShift</div>
+    <div id="div-button-ps" class="button-size"><webaudio-switch id="switch-pitchshift" src="images/ProphetButton.png" value="0" height="128" width="85"></webaudio-switch></div>
+    <div id="div-button-dl-text">Delay</div>
+    <div id="div-button-dl" class="button-size"><webaudio-switch id="switch-delay" src="images/ProphetButton.png" value="0" height="128" width="85"></webaudio-switch></div>
+    <div id="div-button-dltype-text">Type</div>
+    <div id="div-button-direction"><webaudio-switch id="switch-delaydirection" src="images/switch_toggle.png" value="0" height="56" width="56"></webaudio-switch></div>
+    <div id="div-button-pitch-text">Pitch</div>
+    <div id="div-button-pitch"><webaudio-switch id="switch-togglepitch" src="images/switch_toggle.png" value="0" height="56" width="56"></webaudio-switch></div>
+    <div id="div-button-dltime-text">Time</div>
+    <div id="div-button-dltime"><webaudio-knob id="knob-delaytime" src="./images/flatknob3.png" sprites="30" value="0.5" min="0" max="1" step="0.05" diameter="35"></webaudio-knob></div>
+    <div id="div-button-dlgain-text">Gain</div>
+    <div id="div-button-dlgain"><webaudio-knob id="knob-delaygain" src="./images/flatknob3.png" sprites="30" value="0.5" min="0" max="0.8" step="0.05" diameter="35"></webaudio-knob></div>
+  </div>
+
+	<script type="text/javascript" src="./js/dsp.js"></script>
+	<script type="text/javascript" src="./js/pitchshifter.js"></script>
+	<script type="text/javascript" src="./js/delayProcess.js"></script>
+  <script type="text/javascript" src="./js/app.js"></script>
+
+</body>
+</html>

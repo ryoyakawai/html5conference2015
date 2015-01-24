@@ -1,0 +1,14 @@
+{
+  "name": "Analog Synthsizer(2 Oscillator)",
+  "version": "0.1",
+  "manifest_version": 2,
+  "app": {
+    "background": {
+      "scripts": ["js/background.js"]
+    }
+  },
+  "icons": {
+    "512" : "images/analog-icon-512.png"
+  },
+  "permissions": []
+}

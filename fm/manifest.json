@@ -1,0 +1,14 @@
+{
+  "name": "FM Synthsizer(1 Operator, 1 Carrier)",
+  "version": "0.1",
+  "manifest_version": 2,
+  "app": {
+    "background": {
+      "scripts": ["js/background.js"]
+    }
+  },
+  "icons": {
+    "512" : "images/fm-icon-512.png"
+  },
+  "permissions": []
+}

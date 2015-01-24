@@ -1,0 +1,135 @@
+body {
+  font-family:arial;
+  padding:10px;
+}
+div.knobs {
+  width:25px; 
+  border-radius:50%; 
+}
+div.knob {
+  width:35px; 
+  border-radius:50%; 
+  background-color:rgba(77, 208, 225, 0.5); /*rgba(255, 255, 255, 0.8);*/
+}
+div#lfo0gain-knob {
+  position:absolute; 
+  top:45px; 
+  left:22px;
+}
+div#lfo1gain-knob {
+  position:absolute; 
+  top:166px; 
+  left:22px;
+}
+div#modvcf0gain-knob {
+  position:absolute; 
+  top:298px; 
+  left:281px;
+}
+div#lfo0freq-slider {
+  position:absolute; 
+  top:366px; 
+  left:63px;
+}
+div#vcf0freq-slider {
+  position:absolute; 
+  top:186px;
+  left:366px;
+}
+div#vcf0q-knob {
+  position:absolute; 
+  top:177px;
+  left:506px;
+}
+div#vca0gain-knob {
+  position:absolute; 
+  top:77px;
+  left:593px;
+}
+div#vco1detune-knob {
+  position:absolute; 
+  top:205px;
+  left:216px;
+}
+
+
+div#analyser-vcf00 {
+  position:absolute;
+  top:80px; left:286px;
+  width:147px; height:95px;
+  background-color:rgba(239, 239, 239, 1);
+}
+div#analyser-vcf01 {
+  position:absolute;
+  top:80px; left:436px;
+  width:147px; height:95px;
+  background-color:rgba(239, 239, 239, 1);
+}
+
+div#analyser-vco00 {
+  position:absolute;
+  top:18px; left:66px;
+  width:147.5px; height:95px;
+  background-color:rgba(239, 239, 239, 1);
+}
+div#analyser-vco01 {
+  position:absolute;
+  top:135px; left:66px;
+  width:147.5px; height:95px;
+  background-color:rgba(239, 239, 239, 1);
+}
+div#analyser-lfo00 {
+  position:absolute;
+  top:268px; left:66px;
+  width:147.5px; height:95px;
+  background-color:rgba(239, 239, 239, 1);
+}
+
+div#main-frame {
+  position:relative;
+  background-color:#B71C1C; /*rgba(166, 31, 31, 1);*/
+  width:700px; height:568px;
+  padding:25px;
+  border-radius:10px;
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+div#control-panel {
+  position:relative;
+  left:8px;
+  width:677px; height:430px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}
+div#synth00-controls {
+  position:relative;
+  width:677px; height:397px;
+  background: url("../images/analogsynth02.png") no-repeat left top;
+}
+div#synth00-title {
+  position:relative;
+  width:683px; height:33px;
+  background-color:rgba(0, 172, 193, 1);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  z-index:1;
+}
+div#synth00-frame {
+  position:relative;
+  width:683px; height:397px;
+  background-color:rgba(77, 208, 225, 1); /* #4dd0e1 */
+}
+div#control-panel-top {
+  position:relative;
+  width:699px;
+  padding:5px 0px;
+  z-index:1;
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+div#keyboard-frame {
+  position:relative;
+  width:699px;
+  margin-top:0px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}
+span#midiinput {
+  position:absolute;
+  right:0px;
+}
