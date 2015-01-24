@@ -1,0 +1,192 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="./css/02.css">
+    <script src="bower_components/webcomponentsjs/webcomponents.js"></script>
+    <link rel="import" href="./bower_components/x-webmidi/x-webmidirequestaccess.html">
+    <link rel="import" href="./bower_components/x-webmidi/x-webmidiinput.html">
+    <link rel="import" href="./bower_components/x-webmidi/x-webmidioutput.html">
+    <link rel="import" href="./components/polymer_analyser.html">
+  </head>
+  <body>
+    <x-webmidirequestaccess sysex="true" input="true" output="true"></x-webmidirequestaccess>
+    <polymer-analyser id="xanalyser00"></polymer-analyser>
+    <polymer-analyser id="xanalyser01"></polymer-analyser>
+    <div id="container">
+      <button id="start">START</button>
+      <button id="stop">STOP</button>
+      <div id="figure00">
+        <div id="analyser00"></div>
+        <div id="analyser01"></div>
+        <div id="div-freq"><input id="freq" type="number" min="240" max="4100" step="10" value="460"></div>
+        <div id="div-type">
+          <select id="type" type="select">
+            <option value="sine">sine</option>
+            <option value="square">square</option>
+            <option value="sawtooth" selected>sawtooth</option>
+            <option value="triangle">triangle</option>
+          </select>
+        </div>
+        <div id="div-gain"><input id="gain" type="number" min="0" max="1" step="0.1" value="0.3"></div>
+      </div>
+    </div>
+    cutoff: <input id="cutoff" type="range" min="0.001" max="900" step="0.01" value="72">
+    peak: <input id="peak" type="range" min="0.001" max="1000" step="0.01" value="57">
+    <br>
+    rate: <input id="rate" type="range" min="0.001" max="900" step="0.01" value="1.0">
+    int.: <input id="intensity" type="range" min="0.5" max="500" step="0.5" value="10">
+    <br>
+    <x-webmidiinput id="input00"></x-webmidiinput>
+
+    <script>
+    window.addEventListener("midiin-event:input00", function(event){
+        var property=event.detail.property;
+        switch(property.subType) {
+            case "noteOn":
+                if(isPlaying==true) return;
+                freq.value=event.detail.property.frequency;
+                var e=document.createEvent("MouseEvents");
+                e.initEvent("change", false, true);
+                freq.dispatchEvent(e);
+                
+                var e=document.createEvent("MouseEvents");
+                e.initEvent("mousedown", false, true);
+                document.getElementById("start").dispatchEvent(e);
+                break;
+            case "noteOff":
+                var e=document.createEvent("MouseEvents");
+                e.initEvent("mouseup", false, true);
+                document.getElementById("stop").dispatchEvent(e);
+                break;
+        }
+    });
+    </script>
+    <script>
+    var start=document.getElementById("start");
+    var stop=document.getElementById("stop");
+    var freq=document.getElementById("freq");
+    var type=document.getElementById("type");
+    var gain=document.getElementById("gain");
+    var cutoff=document.getElementById("cutoff");
+    var peak=document.getElementById("peak");
+    var rate=document.getElementById("rate");
+    var intensity=document.getElementById("intensity");
+
+    var actx=new webkitAudioContext();
+    var anl0, anal1, vco0, gain0, lfo0, lfo0Gain;
+    var isPlaying=false;
+    type.addEventListener("change", function(event){
+        vco0.type=event.target.value;
+    });
+    freq.addEventListener("change", function(event){
+        if(typeof vco0!="undefined") vco0.frequency.value=event.target.value;
+    });
+    gain.addEventListener("change", function(event){
+        gain0.gain.value=event.target.value;
+    });
+    cutoff.addEventListener("change", function(event){
+        vcf0.Q.value=event.target.value;
+    });
+    peak.addEventListener("change", function(event){
+        gain0.gain.value=event.target.value;
+    });
+    rate.addEventListener("change", function(event){
+        lfo0.frequency.value=event.target.value;
+    });
+    intensity.addEventListener("change", function(event){
+        lfo0Gain.gain.value=event.target.value;
+    });
+
+    start.addEventListener("mousedown", function(event){
+        anl0=actx.createAnalyser();
+        anl1=actx.createAnalyser();
+
+        vco0=actx.createOscillator();
+        lfo0=actx.createOscillator();
+        lfo0Gain=actx.createGain();
+        vcf0=actx.createBiquadFilter();
+        gain0=actx.createGain();
+
+        vco0.connect(vcf0);
+        vcf0.connect(gain0);
+        lfo0.connect(lfo0Gain);
+        lfo0Gain.connect(vcf0.frequency);
+        
+        gain0.connect(actx.destination);
+
+        vco0.type=type.value;
+        lfo0.type="sawtooth";
+
+        vco0.frequency.value=freq.value;
+        gain0.gain.value=gain.value;
+
+        vco0.connect(anl0);
+        var al0=document.getElementById("xanalyser00");
+        al0.setParams(anl0, "l_byCount", 185, 119, 360);
+        al0.runAnalyser();
+        document.getElementById("analyser00").appendChild(al0.getCanvas());
+
+        gain0.connect(anl1);
+        var al1=document.getElementById("xanalyser01");
+        al1.setParams(anl1, "l_byCount", 265, 119, 360);
+        al1.runAnalyser();
+        document.getElementById("analyser01").appendChild(al1.getCanvas());
+
+        vco0.start(0);
+        lfo0.start(0);
+        isPlaying=true;
+    });
+    stop.addEventListener("mouseup", function(event){
+        document.getElementById("analyser00").innerHTML="";
+        document.getElementById("analyser01").innerHTML="";
+        vco0.stop(0);
+        lfo0.stop(0);
+        isPlaying=false;
+    });
+    window.addEventListener("keydown", function(event) {
+        //console.log(event.keyCode);
+        if(isPlaying==true) {
+            switch(event.keyCode) {
+                case 49: // 1
+                    type.value="sine";
+                    break;
+                case 50: // 2
+                    type.value="square";
+                    break;
+                case 51: // 3
+                    type.value="sawtooth";
+                    break;
+                case 52: // 4
+                    type.value="triangle";
+                    break;
+            }
+            var e=document.createEvent("MouseEvents");
+            e.initEvent("change", false, true);
+            type.dispatchEvent(e);
+        }
+        switch(event.keyCode) {
+            case 68: // d
+                var imgStatus=document.getElementById("figure00");
+                if(imgStatus.className=="hide") {
+                    imgStatus.className="";
+            } else {
+                    imgStatus.className="hide";
+            }
+            break;
+            case 32: // [space]
+            var e=document.createEvent("MouseEvents");
+            if(isPlaying==false) {
+                e.initEvent("mousedown", false, true);
+                document.getElementById("start").dispatchEvent(e);
+                isPlaying=true;
+            } else {
+                e.initEvent("mouseup", false, true);
+                document.getElementById("stop").dispatchEvent(e);
+                isPlaying=false;
+            }
+            break;
+        }
+    });
+
+    </script>
+  </body>
+</html>

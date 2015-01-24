@@ -1,0 +1,26 @@
+body {
+  padding:10px;
+}
+div#analyser-mod00 {
+  position:absolute;
+  top:47px; left:37px;
+}
+div#analyser-mod01 {
+  position:absolute;
+  top:47px; left:244px;
+}
+div#analyser-car00 {
+  position:absolute;
+  top:195px; left:37px;
+}
+div#analyser-car01 {
+  position:absolute;
+  top:195px; left:244px;
+}
+
+
+div#figure00 {
+  position:relative;
+  width:538px; height:375px;
+  background: url("../images/fmsynth.png") no-repeat left top;
+}

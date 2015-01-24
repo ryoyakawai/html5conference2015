@@ -1,0 +1,32 @@
+body {
+  padding:10px;
+}
+div#container {
+  margin:10px auto;
+}
+div#analyser00 {
+  position:absolute;
+  top:12px; left:13px;
+}
+div#analyser01 {
+  position:absolute;
+  top:12px; left:290px;
+}
+div#div-freq {
+  position:absolute;
+  top:165px; left:200px;
+  font-size:200px; 
+}
+div#div-type {
+  position:absolute;
+  top:165px; left:56px;
+}
+div#div-gain {
+  position:absolute;
+  top:165px; left:329px;
+}
+div#figure00 {
+  position:relative;
+  width:663px; height:200px;
+  background: url("../images/01.png") no-repeat left top;
+}
