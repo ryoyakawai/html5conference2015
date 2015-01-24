@@ -29,12 +29,6 @@
         <div id="div-gain"><input id="gain" type="number" min="0" max="1" step="0.1" value="0.3"></div>
       </div>
     </div>
-    cutoff: <input id="cutoff" type="range" min="0.001" max="900" step="0.01" value="72">
-    peak: <input id="peak" type="range" min="0.001" max="1000" step="0.01" value="57">
-    <br>
-    rate: <input id="rate" type="range" min="0.001" max="900" step="0.01" value="1.0">
-    int.: <input id="intensity" type="range" min="0.5" max="500" step="0.5" value="10">
-    <br>
     <x-webmidiinput id="input00"></x-webmidiinput>
 
     <script>
@@ -66,10 +60,6 @@
     var freq=document.getElementById("freq");
     var type=document.getElementById("type");
     var gain=document.getElementById("gain");
-    var cutoff=document.getElementById("cutoff");
-    var peak=document.getElementById("peak");
-    var rate=document.getElementById("rate");
-    var intensity=document.getElementById("intensity");
 
     var actx=new webkitAudioContext();
     var anl0, anal1, vco0, gain0, lfo0, lfo0Gain;
@@ -83,38 +73,17 @@
     gain.addEventListener("change", function(event){
         gain0.gain.value=event.target.value;
     });
-    cutoff.addEventListener("change", function(event){
-        vcf0.Q.value=event.target.value;
-    });
-    peak.addEventListener("change", function(event){
-        gain0.gain.value=event.target.value;
-    });
-    rate.addEventListener("change", function(event){
-        lfo0.frequency.value=event.target.value;
-    });
-    intensity.addEventListener("change", function(event){
-        lfo0Gain.gain.value=event.target.value;
-    });
-
     start.addEventListener("mousedown", function(event){
         anl0=actx.createAnalyser();
         anl1=actx.createAnalyser();
 
         vco0=actx.createOscillator();
-        lfo0=actx.createOscillator();
-        lfo0Gain=actx.createGain();
-        vcf0=actx.createBiquadFilter();
         gain0=actx.createGain();
 
-        vco0.connect(vcf0);
-        vcf0.connect(gain0);
-        lfo0.connect(lfo0Gain);
-        lfo0Gain.connect(vcf0.frequency);
-        
+        vco0.connect(gain0);
         gain0.connect(actx.destination);
 
         vco0.type=type.value;
-        lfo0.type="sawtooth";
 
         vco0.frequency.value=freq.value;
         gain0.gain.value=gain.value;
@@ -132,14 +101,12 @@
         document.getElementById("analyser01").appendChild(al1.getCanvas());
 
         vco0.start(0);
-        lfo0.start(0);
         isPlaying=true;
     });
     stop.addEventListener("mouseup", function(event){
         document.getElementById("analyser00").innerHTML="";
         document.getElementById("analyser01").innerHTML="";
         vco0.stop(0);
-        lfo0.stop(0);
         isPlaying=false;
     });
     window.addEventListener("keydown", function(event) {
