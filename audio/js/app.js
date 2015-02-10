@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-var swPs=document.getElementById("switch-pitchshift");
+  var swPs=document.getElementById("switch-pitchshift");
   var swDelay=document.getElementById("switch-delay");
   var swDelayDirec=document.getElementById("switch-delaydirection");
   swPs.addEventListener("change", function(event){
@@ -34,7 +34,8 @@ var swPs=document.getElementById("switch-pitchshift");
       pshift.togglePitch.bind(pshift)();
   });
   document.getElementById("knob-delaygain").addEventListener("change", function(event){
-      delay.controlDelayGain(event.target.value);
+      // 1:forward, 0:reverse
+      delay.controlDelayGain(swDelayDirec.value, event.target.value);
   });
 
   function checkEffect(ps, dl, dt){
@@ -61,7 +62,7 @@ var swPs=document.getElementById("switch-pitchshift");
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
   navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
   var ctx = new AudioContext();
-  var mic, ps, delay, delaySw, localStream;  
+  var mic, ps, delaySw, localStream;  
   var micout=ctx.createGain();
   var psin=ctx.createGain(), psout=ctx.createGain();
   var psdry=ctx.createGain(), delaydry=ctx.createGain();
@@ -70,14 +71,12 @@ var swPs=document.getElementById("switch-pitchshift");
   var type=false;
 
   var pshift=new pitchShift(ctx);
-  pshift.createLoop(psin);
-  var t_psout=pshift.getProcessedNode();
-  t_psout.connect(psout);
+  psin.connect(pshift);
+  pshift.connect(psout);
 
   var delay=new delayProcess(ctx);
-  delay.createLoop(1, delayin);
-  var t_delayout=delay.getProcessedNode();
-  t_delayout.connect(delayout);
+  delayin.connect(delay);
+  delay.connect(delayout);
 
   psout.connect(intersection0);
   intersection0.connect(delayin);
@@ -114,10 +113,11 @@ var swPs=document.getElementById("switch-pitchshift");
 
   window.addEventListener("load", initMic,false);
   document.getElementById("knob-delaytime").addEventListener("change", function(event){
-      delay.controlDelayTime();
+      delay.controlDelayTime(event.target.value, delay);
   });
   function updateParam(type) {
       var value=0.5;
+      var delayGain=document.getElementById("knob-delaygain").value;
       switch(parseInt(type)) {
           case 0:
               // dry
@@ -130,7 +130,7 @@ var swPs=document.getElementById("switch-pitchshift");
               break;
           case 1:
               // delay (no main)
-              delay.controlDryGain("reverse", 1.0);
+              delay.controlDryGain("reverse", delayGain);
               psdry.gain.value=1;
               psin.gain.value=0;
               
@@ -148,16 +148,16 @@ var swPs=document.getElementById("switch-pitchshift");
               break;
           case 3:
               // pitchshift
-              delay.controlDryGain("forward", value);
+              delay.controlDryGain("forward", delayGain);
               psdry.gain.value=0;
               psin.gain.value=1;
               
               delaydry.gain.value=1;
               delayin.gain.value=0;
               break;
-          case 4:
+        case 4:
               // delayed pitchshift
-              delay.controlDryGain("reverse", 1.0);
+              delay.controlDryGain("forward", delayGain);
               psdry.gain.value=0;
               psin.gain.value=1;
               
@@ -166,7 +166,7 @@ var swPs=document.getElementById("switch-pitchshift");
               break;
           case 5:
               // pitchshift delay
-              delay.controlDryGain("forward", value);
+              delay.controlDryGain("reverse", value);
               psdry.gain.value=0;
               psin.gain.value=1;
               

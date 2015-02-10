@@ -13,8 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-var delayProcess=function(ctx) {
-    this.time=0.3;
+function delayProcess(ctx) {
+    this.ctx=ctx;
+
+    this.srcNode=ctx.createGain();
     this.ctx=ctx;
     this.d_nodes=[];
     this.d_gain=[];
@@ -23,61 +25,55 @@ var delayProcess=function(ctx) {
     this.outNode1=ctx.createGain();
     this.outNode2=ctx.createGain();
     this.dryGain=ctx.createGain();
-    this.count=0;
-};
-delayProcess.prototype={
-    createLoop: function(count, srcNode) {
-        count=1;
-        this.count=count;
-        this.srcNode=srcNode;
-        for(var i=0; i<this.count; i++) {
-            // createNodes(delay, gain)
-            this.d_nodes[i]=ctx.createDelay();
-            this.d_nodes[i].delayTime.value=0.5;
-            this.d_gain[i]=ctx.createGain();
-            this.d_gain[i].gain.value=0;
-            this.d_gain2[i]=ctx.createGain();
-            this.d_gain2[i].gain.value=1.0;
-            
-            // connect
-            srcNode.connect(this.outNode);
-            this.outNode.connect(this.outNode1);
-            this.outNode1.connect(this.outNode2);
-            this.outNode.connect(this.d_nodes[i]);
-            this.d_nodes[i].connect(this.d_gain[i]);
-            this.d_nodes[i].connect(this.d_gain2[i]);
-            this.d_gain[i].connect(srcNode);
-            this.d_gain2[i].connect(this.outNode2);
-            this.d_gain2[i].gain.value=0;
-        }
-    },
-    controlDryGain: function(type, value) {
+
+    this.srcNode.console=function(name){
+        console.log(this[name]);
+    }.bind(this);
+    
+    // createNodes(delay, gain)
+    this.d_nodes=ctx.createDelay();
+    this.d_nodes.delayTime.value=0.5;
+    this.d_gain=ctx.createGain();
+    this.d_gain2=ctx.createGain();
+    
+    // connect
+    this.srcNode.connect(this.outNode);
+    this.outNode.connect(this.outNode1);
+    this.outNode1.connect(this.outNode2);
+    this.outNode.connect(this.d_nodes);
+    this.d_nodes.connect(this.d_gain);
+    this.d_nodes.connect(this.d_gain2);
+    this.d_gain.connect(this.srcNode);
+    this.d_gain2.connect(this.outNode2);
+
+    this.srcNode.controlDryGain=function(type, value) {
         var v=0.5, v1=1.0, v2=0;
         if(type=="reverse") {
             v=0, v1=0, v2=value;
         } else {
             v=value, v1=1.0, v2=0;
         }
-
         this.outNode1.gain.value=v1;
-        for(var i=0; i<this.count; i++) {
-            this.d_gain[i].gain.value=v;
-            this.d_gain2[i].gain.value=v2;
+        this.d_gain.gain.value=v;
+        this.d_gain2.gain.value=v2;
+    }.bind(this);
+    this.srcNode.controlDelayTime=function(value) {
+        this.d_nodes.delayTime.value=value;
+    }.bind(this);
+    this.srcNode.controlDelayGain=function(type, value) {
+        // type: 1:forward, 0:reverse
+        if(type==0) {
+            this.d_gain.gain.value=value;
+            this.d_gain2.gain.value=0;
         }
-    },
-    controlDelayTime: function(value) {
-        for(var i=0; i<this.count; i++) {
-            this.d_nodes[i].delayTime.value=value;
+        if(type==1) {
+            this.d_gain.gain.value=0;
+            this.d_gain2.gain.value=value;
         }
-    },
-    controlDelayGain: function(value) {
-        for(var i=0; i<this.count; i++) {
-            this.d_gain[i].gain.value=value;
-            this.d_gain2[i].gain.value=value;
-        }
-    },
-    getProcessedNode: function() {
-        return this.outNode2;
-    }
-
-};
+    }.bind(this);
+    this.srcNode.connect=function(node) {
+        this.outNode2.connect(node);
+    }.bind(this);
+    
+    return this.srcNode;
+}

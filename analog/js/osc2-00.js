@@ -239,7 +239,7 @@ vco1Type.addEventListener("click", function(event){
 
 
 // Web Audio 
-var ctx=new AudioContext() || webkitAudioContext();
+var ctx=new webkitAudioContext() || AudioContext();
 // // Synth
 var vco0=[], vco1=[], lfo=[], vcf0=[], vco0Gain=[], vco1Gain=[], modVcfGain=[], lfo0Gain=[], lfo1Gain=[];
 var oscType=["sine", "square", "sawtooth", "triangle"];
