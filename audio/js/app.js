@@ -71,11 +71,11 @@ limitations under the License.
   var type=false;
 
   var pshift=new pitchShift(ctx);
-  psin.connect(pshift);
+  psin.connect(pshift.getSrc());
   pshift.connect(psout);
 
   var delay=new delayProcess(ctx);
-  delayin.connect(delay);
+  delayin.connect(delay.getSrc());
   delay.connect(delayout);
 
   psout.connect(intersection0);
