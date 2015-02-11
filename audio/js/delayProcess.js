@@ -13,28 +13,24 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-function delayProcess(ctx) {
+var delayProcess=function(ctx) {
     this.ctx=ctx;
 
-    this.srcNode=ctx.createGain();
+    this.srcNode=this.ctx.createGain();
     this.ctx=ctx;
     this.d_nodes=[];
     this.d_gain=[];
     this.d_gain2=[];
-    this.outNode=ctx.createGain();
-    this.outNode1=ctx.createGain();
-    this.outNode2=ctx.createGain();
-    this.dryGain=ctx.createGain();
+    this.outNode=this.ctx.createGain();
+    this.outNode1=this.ctx.createGain();
+    this.outNode2=this.ctx.createGain();
+    this.dryGain=this.ctx.createGain();
 
-    this.srcNode.console=function(name){
-        console.log(this[name]);
-    }.bind(this);
-    
     // createNodes(delay, gain)
-    this.d_nodes=ctx.createDelay();
+    this.d_nodes=this.ctx.createDelay();
     this.d_nodes.delayTime.value=0.5;
-    this.d_gain=ctx.createGain();
-    this.d_gain2=ctx.createGain();
+    this.d_gain=this.ctx.createGain();
+    this.d_gain2=this.ctx.createGain();
     
     // connect
     this.srcNode.connect(this.outNode);
@@ -45,8 +41,15 @@ function delayProcess(ctx) {
     this.d_nodes.connect(this.d_gain2);
     this.d_gain.connect(this.srcNode);
     this.d_gain2.connect(this.outNode2);
-
-    this.srcNode.controlDryGain=function(type, value) {
+};
+delayProcess.prototype={
+    getSrc: function() {
+        return this.srcNode;
+    },
+    connect:function(node) {
+        this.outNode2.connect(node);
+    },
+    controlDryGain: function(type, value) {
         var v=0.5, v1=1.0, v2=0;
         if(type=="reverse") {
             v=0, v1=0, v2=value;
@@ -56,11 +59,11 @@ function delayProcess(ctx) {
         this.outNode1.gain.value=v1;
         this.d_gain.gain.value=v;
         this.d_gain2.gain.value=v2;
-    }.bind(this);
-    this.srcNode.controlDelayTime=function(value) {
+    },
+    controlDelayTime:function(value) {
         this.d_nodes.delayTime.value=value;
-    }.bind(this);
-    this.srcNode.controlDelayGain=function(type, value) {
+    },
+    controlDelayGain:function(type, value) {
         // type: 1:forward, 0:reverse
         if(type==0) {
             this.d_gain.gain.value=value;
@@ -70,10 +73,5 @@ function delayProcess(ctx) {
             this.d_gain.gain.value=0;
             this.d_gain2.gain.value=value;
         }
-    }.bind(this);
-    this.srcNode.connect=function(node) {
-        this.outNode2.connect(node);
-    }.bind(this);
-    
-    return this.srcNode;
-}
+    }
+};
