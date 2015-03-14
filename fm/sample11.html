@@ -1,0 +1,115 @@
+<html>
+  <head>
+    <title>Sample 11 | HTML5 Experts.jp</title>
+  </head>
+  <body>
+    <div>HTML5 Experts.jp の掲載記事のライブデモです。</div>
+
+    <script src="./bower_components/webcomponentsjs/webcomponents.js"></script>
+    <link rel="import" href="./bower_components/x-webmidi/x-webmidirequestaccess.html">
+    <x-webmidirequestaccess sysex="true" input="true" output="true"></x-webmidirequestaccess>
+
+    <div>
+      <span>MIDI IN: </span><x-webmidiinput id="midi-input"></x-webmidiinput>
+    </div>
+    <script>
+    var isPlaying=[];
+    document.getElementById("midi-input").addEventListener("midiin-event:midi-input", function(event){
+        if(event.detail.type=="channel") {
+            var property=event.detail.property;
+            switch(event.detail.subType) {
+                case "noteOn":
+                    if(typeof isPlaying[property.noteNumber]!="object") {
+                        isPlaying[property.noteNumber]=new fmSynth();
+                        isPlaying[property.noteNumber].noteOn(property.frequency);
+                    }
+                    break;
+                case "noteOff":
+                    if(typeof isPlaying[property.noteNumber]=="object") {
+                        isPlaying[property.noteNumber].noteOff();
+                        delete isPlaying[property.noteNumber];
+                    }
+                    break;
+            }
+        }
+    });
+    </script>
+    <script>
+    var ctx=new AudioContext();
+    var fmSynth=function() {
+        this.modulator, this.carrier;
+        this.modulatorGain, this.carrierGain, this.feedbackGain;
+    }
+    fmSynth.prototype={
+        noteOn: function(frequency) {
+            this.modulator=ctx.createOscillator(); // モジュレータを作成
+            this.carrier=ctx.createOscillator();   // キャリアを作成
+            this.modulatorGain=ctx.createGain();   // モジュレータの振幅を制御する為のGainの作成
+            this.carrierGain=ctx.createGain();     // キャリアの振幅を制御する為のGainの作成
+            this.feedbackGain=ctx.createGain();    // フィードバックの振幅を制御する為のGainの作成
+
+            // 接続
+            var presetList={ "name":"Elec.Piano1", "freqRatio":[1,9], "feedback":"0", "outRatio":[99,55]};
+            this.modulator.connect(this.modulatorGain);          // モジュレータとモジュレータGainの接続
+            this.modulatorGain.connect(this.carrier.frequency);  // モジュレータGainとキャリアの接続
+            this.carrier.connect(this.carrierGain);              // キャリアとキャリアGainの接続
+            this.carrierGain.connect(ctx.destination);      // キャリアGainとDestinationの接続
+            this.modulator.connect(this.feedbackGain);           // モジュレータとフィードバックGainの接続
+            this.feedbackGain.connect(this.modulator.frequency); // フィードバックGainとモジュレータの接続
+
+            this.carrier.frequency.value=frequency;
+
+            // 値を変更
+            this.modulator.frequency.value=presetList.freqRatio[1]*this.carrier.frequency.value;
+            this.carrier.frequency.value=presetList.freqRatio[0]*this.carrier.frequency.value;
+            this.feedbackGain.gain.value=presetList.feedback;
+            this.modulatorGain.gain.value=(presetList.outRatio[1]/100)*this.carrier.frequency.value*8;
+            this.carrierGain.gain.value=(presetList.outRatio[0]/100);
+
+            this.modulator.start(0);
+            this.carrier.start(0);
+
+            var now=ctx.currentTime;
+            var m_attack=0, m_decay=0.5, m_sustain=0.3, m_release=0.5;
+            var c_attack=0.4, c_decay=0.3, c_sustain=0.7, c_release=0.4;
+
+            var modulatorRootValue=this.modulatorGain.gain.value;
+            this.modulatorGain.gain.cancelScheduledValues(0);
+            this.modulatorGain.gain.setValueAtTime(0.0, now);
+            this.modulatorGain.gain.linearRampToValueAtTime(modulatorRootValue, now + m_attack);
+            this.modulatorGain.gain.linearRampToValueAtTime(m_sustain * modulatorRootValue, now + m_attack + m_decay);
+            
+            var carrierRootValue=this.carrierGain.gain.value;
+            this.carrierGain.gain.cancelScheduledValues(0);
+            this.carrierGain.gain.setValueAtTime(0.0, now);
+            this.carrierGain.gain.linearRampToValueAtTime(carrierRootValue, now + c_attack);
+            this.carrierGain.gain.linearRampToValueAtTime(c_sustain * carrierRootValue, now + c_attack + c_decay);
+        },
+        noteOff: function(frequency) {
+            var now=ctx.currentTime;
+            var m_attack=0, m_decay=0.5, m_sustain=0.3, m_release=0.5;
+            var c_attack=0.4, c_decay=0.3, c_sustain=0.7, c_release=0.4;
+
+            var modulatorRootValue=this.modulatorGain.gain.value;
+            this.modulatorGain.gain.cancelScheduledValues(0);
+            this.modulatorGain.gain.setValueAtTime(modulatorRootValue, now);
+            this.modulatorGain.gain.linearRampToValueAtTime(modulatorRootValue, now);
+            this.modulatorGain.gain.linearRampToValueAtTime(0.0, now + m_release);
+            
+            var carrierRootValue=this.carrierGain.gain.value;
+            this.carrierGain.gain.cancelScheduledValues(0);
+            this.carrierGain.gain.setValueAtTime(carrierRootValue, now);
+            this.carrierGain.gain.linearRampToValueAtTime(carrierRootValue, now);
+            this.carrierGain.gain.linearRampToValueAtTime(0.0, now + c_release);
+            
+            var release=m_release;
+            if(release<c_release) release=c_release;
+
+            this.modulator.stop(now + release);
+            this.carrier.stop(now + release);
+        }
+    }
+
+    </script>
+  </body>
+</html>

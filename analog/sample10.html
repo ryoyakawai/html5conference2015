@@ -1,0 +1,110 @@
+<html>
+  <head>
+    <title>Sample 10 | HTML5 Experts.jp</title>
+  </head>
+  <body>
+    <div>HTML5 Experts.jp の掲載記事のライブデモです。</div>
+
+    <script src="./bower_components/webcomponentsjs/webcomponents.js"></script>
+    <link rel="import" href="./bower_components/x-webmidi/x-webmidirequestaccess.html">
+    <x-webmidirequestaccess sysex="true" input="true" output="true"></x-webmidirequestaccess>
+
+    <div>
+      <span>MIDI IN: </span><x-webmidiinput id="midi-input"></x-webmidiinput>
+    </div>
+    <script>
+    var isPlaying=[];
+    document.getElementById("midi-input").addEventListener("midiin-event:midi-input", function(event){
+        if(event.detail.type=="channel") {
+            var property=event.detail.property;
+            switch(event.detail.subType) {
+                case "noteOn":
+                    if(typeof isPlaying[property.noteNumber]!="object") {
+                        isPlaying[property.noteNumber]=new analogSynth();
+                        isPlaying[property.noteNumber].noteOn(property.frequency);
+                    }
+                    break;
+                case "noteOff":
+                    if(typeof isPlaying[property.noteNumber]=="object") {
+                        isPlaying[property.noteNumber].noteOff();
+                        delete isPlaying[property.noteNumber];
+                    }
+                    break;
+            }
+        }
+    });
+    </script>
+    <script>
+    var ctx=new AudioContext();
+    var analogSynth=function() {
+        this.vco0, this.vco1, this.lfo, this.vcf;
+    }
+    analogSynth.prototype={
+        noteOn: function(frequency) {
+            this.vco0=ctx.createOscillator();
+            this.vco1=ctx.createOscillator();
+            this.lfo=ctx.createOscillator();
+            this.vcf=ctx.createBiquadFilter();
+
+            this.vco0gain=ctx.createGain();
+            this.vco1gain=ctx.createGain();
+            
+            this.vco0.connect(this.vco0gain);
+            this.vco1.connect(this.vco1gain);
+            this.vco0gain.connect(this.vcf);
+            this.vco1gain.connect(this.vcf);
+            this.lfo.connect(this.vco0.frequency);
+            this.lfo.connect(this.vco1.frequency);
+            this.lfo.connect(this.vcf.detune);
+            this.vcf.connect(ctx.destination);
+
+            this.vco0.frequency.value=frequency;
+            this.vco1.frequency.value=frequency;
+
+            this.vco0.type="sawtooth";
+            this.vco1.detune.value=-35;
+            this.lfo.frequency.value=2;
+            this.vcf.frequency.value=10000;
+
+            this.vco0.start(0);
+            this.vco1.start(0);
+            this.lfo.start(0);
+
+            var now=ctx.currentTime;
+            var attack=0.5, decay=0.5, sustain=0.5, release=0.5;
+
+            var rootValue0=0.8;
+            this.vco0gain.gain.cancelScheduledValues(0);
+            this.vco0gain.gain.setValueAtTime(0.0, now);
+            this.vco0gain.gain.linearRampToValueAtTime(rootValue0, now + attack);
+            this.vco0gain.gain.linearRampToValueAtTime(sustain * rootValue0, now + attack + decay);
+
+            var rootValue1=0.8;
+            this.vco1gain.gain.cancelScheduledValues(0);
+            this.vco1gain.gain.setValueAtTime(0.0, now);
+            this.vco1gain.gain.linearRampToValueAtTime(rootValue0, now + attack);
+            this.vco1gain.gain.linearRampToValueAtTime(sustain * rootValue0, now + attack + decay);
+        },
+        noteOff: function() {
+            var now=ctx.currentTime;
+            var attack=0.5, decay=0.5, sustain=0.5, release=0.5;
+
+            var rootValue0=this.vco0gain.gain.value;
+            this.vco0gain.gain.cancelScheduledValues(0);
+            this.vco0gain.gain.setValueAtTime(this.vco0gain.gain.value, now);
+            this.vco0gain.gain.linearRampToValueAtTime(0.0, now + release);
+
+            var rootValue1=this.vco0gain.gain.value;
+            this.vco1gain.gain.cancelScheduledValues(0);
+            this.vco1gain.gain.setValueAtTime(this.vco1gain.gain.value, now);
+            this.vco1gain.gain.linearRampToValueAtTime(0.0, now + release);
+            
+            this.vco0.stop(now + release);
+            this.vco1.stop(now + release);
+            this.lfo.stop(now + release);
+        }
+    }
+
+    </script>
+  </body>
+</html>

@@ -18,9 +18,6 @@ var delayProcess=function(ctx) {
 
     this.srcNode=this.ctx.createGain();
     this.ctx=ctx;
-    this.d_nodes=[];
-    this.d_gain=[];
-    this.d_gain2=[];
     this.outNode=this.ctx.createGain();
     this.outNode1=this.ctx.createGain();
     this.outNode2=this.ctx.createGain();
@@ -30,7 +27,9 @@ var delayProcess=function(ctx) {
     this.d_nodes=this.ctx.createDelay();
     this.d_nodes.delayTime.value=0.5;
     this.d_gain=this.ctx.createGain();
+    this.d_gain.gain.value=0.3;
     this.d_gain2=this.ctx.createGain();
+    this.d_gain2.gain.value=0.0;
     
     // connect
     this.srcNode.connect(this.outNode);

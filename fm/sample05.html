@@ -1,0 +1,61 @@
+<html>
+  <head>
+    <title>Sample 05 | HTML5 Experts.jp</title>
+  </head>
+  <body>
+    <div>HTML5 Experts.jp の掲載記事のライブデモです。</div>
+
+    <button id="button">start</button>
+    <script>
+    var ctx=new AudioContext();
+    var modulator, carrier;
+    var modulatorGain, carrierGain, feedbackGain;
+    
+    modulator=ctx.createOscillator(); // モジュレータを作成
+    carrier=ctx.createOscillator();   // キャリアを作成
+    modulatorGain=ctx.createGain();   // モジュレータの振幅を制御する為のGainの作成
+    carrierGain=ctx.createGain();     // キャリアの振幅を制御する為のGainの作成
+    feedbackGain=ctx.createGain();    // フィードバックの振幅を制御する為のGainの作成
+
+    // 接続
+    modulator.connect(modulatorGain);          // モジュレータとモジュレータGainの接続
+    modulatorGain.connect(carrier.frequency);  // モジュレータGainとキャリアの接続
+    carrier.connect(carrierGain);              // キャリアとキャリアGainの接続
+    carrierGain.connect(ctx.destination);      // キャリアGainとDestinationの接続
+    modulator.connect(feedbackGain);           // モジュレータとフィードバックGainの接続
+    feedbackGain.connect(modulator.frequency); // フィードバックGainとモジュレータの接続
+
+    carrier.frequency.value=440;
+
+    // 値を変更
+    //var presetList={ "name":"Elec.Piano1", "freqRatio":[1,9], "feedback":"0", "outRatio":[99,55]};
+    //var freq=540;
+    //modulator.frequency.value=presetList.freqRatio[1]*freq;
+    //carrier.frequency.value=presetList.freqRatio[0]*freq;
+    //feedbackGain.gain.value=presetList.feedback;
+    //modulatorGain.gain.value=(presetList.outRatio[1]/100)*1024;
+    //carrierGain.gain.value=(presetList.outRatio[0]/100);
+
+    // ボタンを押下した時の動作
+    var timerId;
+    document.getElementById("button").addEventListener("mousedown", function(event){
+        switch(event.target.innerText) {
+            case "start":
+                event.target.innerText="stop";
+                modulator.start(0);
+                carrier.start(0);                
+                break;
+            case "stop":
+                event.target.innerText="reload";
+                modulator.stop(0);
+                carrier.stop(0);
+                clearInterval(timerId);
+                break;
+            case "reload":
+                location.reload();
+                break;
+        }
+    });
+    </script>
+  </body>
+</html>

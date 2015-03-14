@@ -161,7 +161,6 @@ function noteOn(noteNo, velocity) {
         mainGain.gain.value=maingain.value;
     
         // setting parameters
-        //var freq=440;
         velocityGain[noteNo].gain.value=velocity/127;
         var freqRatio=presetList[selectedPreset].freqRatio.split(":");
         var outRatio=presetList[selectedPreset].outRatio.split(":");
@@ -170,7 +169,7 @@ function noteOn(noteNo, velocity) {
         car[noteNo].frequency.value = freqRatio[0]*freq;
         fbGain[noteNo].gain.value=presetList[selectedPreset].feedback;
         mod0Index[noteNo].gain.value = (outRatio[1]/100)*freq*8;
-        carIndex[noteNo].gain.value = (outRatio[0]/100);;
+        carIndex[noteNo].gain.value = (outRatio[0]/100);
 
         // analyser
         carAnalyser=ctx.createAnalyser();
@@ -195,8 +194,8 @@ function noteOn(noteNo, velocity) {
         mod0Target.linearRampToValueAtTime(env00.d_v * mod0RootVal, now + env00.a + env00.d);
 
         carTarget.setValueAtTime(0.0, now);
-        carTarget.linearRampToValueAtTime(carRootVal, now + env00.a);
-        carTarget.linearRampToValueAtTime(env00.d_v * carRootVal, now + env00.a + env00.d);
+        carTarget.linearRampToValueAtTime(carRootVal, now + env01.a);
+        carTarget.linearRampToValueAtTime(env01.d_v * carRootVal, now + env01.a + env01.d);
 
         // disp analyser
         al0.setParams(carAnalyser, "l_byCount", 205, 99, 360);
