@@ -1,0 +1,108 @@
+<html>
+  <head>
+    <title>Sample 08 | HTML5 Experts.jp</title>
+  </head>
+  <body>
+    <div>HTML5 Experts.jp の掲載記事のライブデモです。</div>
+
+    <script src="./bower_components/webcomponentsjs/webcomponents.js"></script>
+    <link rel="import" href="./bower_components/x-webmidi/x-webmidirequestaccess.html">
+    <x-webmidirequestaccess sysex="true" input="true" output="true"></x-webmidirequestaccess>
+
+    <div>
+      <span>MIDI IN: </span><x-webmidiinput id="midi-input"></x-webmidiinput>
+    </div>
+    <script>
+    document.getElementById("midi-input").addEventListener("midiin-event:midi-input", function(event){
+        if(event.detail.type=="channel") {
+            var property=event.detail.property;
+            switch(event.detail.subType) {
+                case "noteOn":
+                    noteOn(property);
+                    break;
+                case "noteOff":
+                    noteOff(property);
+                    break;
+            }
+        }
+    });
+    </script>
+
+    <script>
+    var ctx=new AudioContext();
+    var vco0, vco1, lfo, vcf;
+    var isPlaying=0;
+
+    function noteOn(property) {
+        if(isPlaying!=0) return;
+        isPlaying=property.noteNumber;
+
+        vco0=ctx.createOscillator();
+        vco1=ctx.createOscillator();
+        lfo=ctx.createOscillator();
+        vcf=ctx.createBiquadFilter();
+
+        vco0gain=ctx.createGain();
+        vco1gain=ctx.createGain();
+        
+        vco0.connect(vco0gain);
+        vco1.connect(vco1gain);
+        vco0gain.connect(vcf);
+        vco1gain.connect(vcf);
+        lfo.connect(vco0.frequency);
+        lfo.connect(vco1.frequency);
+        lfo.connect(vcf.detune);
+        vcf.connect(ctx.destination);
+
+        vco0.frequency.value=property.frequency;
+        vco1.frequency.value=property.frequency;
+
+        vco0.type="sawtooth";
+        vco1.detune.value=-35;
+        lfo.frequency.value=2;
+        vcf.frequency.value=10000;
+
+        vco0.start(0);
+        vco1.start(0);
+        lfo.start(0);
+
+        var now=ctx.currentTime;
+        var attack=0.5, decay=0.5, sustain=0.5, release=0.5;
+
+        var rootValue0=0.8;
+        vco0gain.gain.cancelScheduledValues(0);
+        vco0gain.gain.setValueAtTime(0.0, now);
+        vco0gain.gain.linearRampToValueAtTime(rootValue0, now + attack);
+        vco0gain.gain.linearRampToValueAtTime(sustain * rootValue0, now + attack + decay);
+
+        var rootValue1=0.8;
+        vco1gain.gain.cancelScheduledValues(0);
+        vco1gain.gain.setValueAtTime(0.0, now);
+        vco1gain.gain.linearRampToValueAtTime(rootValue0, now + attack);
+        vco1gain.gain.linearRampToValueAtTime(sustain * rootValue0, now + attack + decay);
+    }
+    function noteOff(property) {
+        if(isPlaying!=property.noteNumber) return;
+
+        var now=ctx.currentTime;
+        var attack=0.5, decay=0.5, sustain=0.5, release=0.5;
+
+        var rootValue0=vco0gain.gain.value;
+        vco0gain.gain.cancelScheduledValues(0);
+        vco0gain.gain.setValueAtTime(vco0gain.gain.value, now);
+        vco0gain.gain.linearRampToValueAtTime(0.0, now + release);
+
+        var rootValue1=vco0gain.gain.value;
+        vco1gain.gain.cancelScheduledValues(0);
+        vco1gain.gain.setValueAtTime(vco1gain.gain.value, now);
+        vco1gain.gain.linearRampToValueAtTime(0.0, now + release);
+        
+        vco0.stop(now + release);
+        vco1.stop(now + release);
+        lfo.stop(now + release);
+
+        isPlaying=0;
+    }
+    </script>
+  </body>
+</html>

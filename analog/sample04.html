@@ -1,0 +1,93 @@
+<html>
+  <head>
+    <title>Sample 04 | HTML5 Experts.jp</title>
+  </head>
+  <body>
+    <div>HTML5 Experts.jp の掲載記事のライブデモです。</div>
+
+    <button id="button">start</button>
+    <script>
+    var ctx=new AudioContext();
+    var vco0, vco1, lfo, vcf;
+    
+    vco0=ctx.createOscillator();
+    vco1=ctx.createOscillator();
+    lfo=ctx.createOscillator();
+    vcf=ctx.createBiquadFilter();
+
+    // ADSR用にGainNodeを追加
+    vco0gain=ctx.createGain();
+    vco1gain=ctx.createGain();
+    
+    vco0.connect(vco0gain); // vco0の接続先を変更
+    vco1.connect(vco1gain); // vco1の接続先を変更
+    vco0gain.connect(vcf);  // vco0gainからvcfへ接続
+    vco1gain.connect(vcf);  // vco1gainからvcfへ接続
+    lfo.connect(vco0.frequency);
+    lfo.connect(vco1.frequency);
+    lfo.connect(vcf.detune);
+    vcf.connect(ctx.destination);
+
+    // 値を変更
+    vco0.type="sawtooth";
+    vco1.detune.value=-35;
+    lfo.frequency.value=2;
+    vcf.frequency.value=10000;
+
+    // ボタンを押下した時の動作
+    document.getElementById("button").addEventListener("mousedown", function(event){
+        switch(event.target.innerText) {
+            case "start":
+                event.target.innerText="stop";
+                vco0.start(0);
+                vco1.start(0);
+                lfo.start(0);
+
+                // 追加 ここから ＞＞＞
+                var now=ctx.currentTime;
+                var attack=0.5, decay=0.5, sustain=0.5, release=0.5;
+
+                var rootValue0=0.8;
+                vco0gain.gain.cancelScheduledValues(0);
+                vco0gain.gain.setValueAtTime(0.0, now);
+                vco0gain.gain.linearRampToValueAtTime(rootValue0, now + attack);
+                vco0gain.gain.linearRampToValueAtTime(sustain * rootValue0, now + attack + decay);
+
+                var rootValue1=0.8;
+                vco1gain.gain.cancelScheduledValues(0);
+                vco1gain.gain.setValueAtTime(0.0, now);
+                vco1gain.gain.linearRampToValueAtTime(rootValue0, now + attack);
+                vco1gain.gain.linearRampToValueAtTime(sustain * rootValue0, now + attack + decay);
+                // 追加 ＜＜＜ ここまで
+
+                break;
+            case "stop":
+                event.target.innerText="reload";
+
+                // 追加 ここから ＞＞＞
+                var now=ctx.currentTime;
+                var attack=0.5, decay=0.5, sustain=0.5, release=0.5;
+
+                var rootValue0=vco0gain.gain.value;
+                vco0gain.gain.cancelScheduledValues(0);
+                vco0gain.gain.setValueAtTime(vco0gain.gain.value, now);
+                vco0gain.gain.linearRampToValueAtTime(0.0, now + release);
+
+                var rootValue1=vco0gain.gain.value;
+                vco1gain.gain.cancelScheduledValues(0);
+                vco1gain.gain.setValueAtTime(vco1gain.gain.value, now);
+                vco1gain.gain.linearRampToValueAtTime(0.0, now + release);
+                // 追加 ＜＜＜ ここまで
+                
+                vco0.stop(now + release);　// Releaseを考慮して停止
+                vco1.stop(now + release);  // Releaseを考慮して停止
+                lfo.stop(now + release);   // Releaseを考慮して停止
+                break;
+            case "reload":
+                location.reload();
+                break;
+        }
+    });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,38 @@
+<html>
+  <head>
+    <title>Sample 01 | HTML5 Experts.jp</title>
+  </head>
+  <body>
+    <div>HTML5 Experts.jp の掲載記事のライブデモです。</div>
+
+	  <script type="text/javascript" src="./js/dsp.js"></script>
+	  <script type="text/javascript" src="./js/pitchshifter.js"></script>
+	  <script type="text/javascript" src="./js/delayProcess.js"></script>
+    <script>
+    var ctx=new AudioContext();
+    var mic;
+    var psin=ctx.createGain(), psout=ctx.createGain();
+    var delayin=ctx.createGain(), delayout=ctx.createGain();
+    
+    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+    navigator.getUserMedia({audio : true}, successCallback, errorCallback);
+    function successCallback(stream) {
+        mic = ctx.createMediaStreamSource(stream);
+        mic.connect(psin);
+    }
+    function errorCallback(msg) {
+        console.log(msg);
+    }
+    var pshift=new pitchShift(ctx);
+    psin.connect(pshift.getSrc());
+    pshift.connect(psout);
+    
+    var delay=new delayProcess(ctx);
+    delayin.connect(delay.getSrc());
+    delay.connect(delayout);
+
+    psout.connect(delayin);
+    delayout.connect(ctx.destination);
+    </script>
+  </body>
+</html>

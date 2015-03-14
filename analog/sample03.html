@@ -1,0 +1,53 @@
+<html>
+  <head>
+    <title>Sample 03 | HTML5 Experts.jp</title>
+  </head>
+  <body>
+    <div>HTML5 Experts.jp の掲載記事のライブデモです。</div>
+
+    <button id="button">start</button>
+    <script>
+    var ctx=new AudioContext();
+    var vco0, vco1, lfo, vcf;
+    
+    vco0=ctx.createOscillator();
+    vco1=ctx.createOscillator();
+    lfo=ctx.createOscillator();
+    vcf=ctx.createBiquadFilter();
+    
+    vco0.connect(vcf);
+    vco1.connect(vcf);
+    lfo.connect(vco0.frequency);
+    lfo.connect(vco1.frequency);
+    lfo.connect(vcf.detune);
+    vcf.connect(ctx.destination);
+
+    // 値を変更
+    vco0.type="sawtooth";
+    vco1.detune.value=-35;
+    lfo.frequency.value=2;
+    vcf.frequency.value=10000;
+
+    // ボタンを押下した時の動作
+    document.getElementById("button").addEventListener("mousedown", function(event){
+        switch(event.target.innerText) {
+            case "start":
+                event.target.innerText="stop";
+                vco0.start(0);
+                vco1.start(0);
+                lfo.start(0);
+                break;
+            case "stop":
+                event.target.innerText="reload";
+                vco0.stop(0);
+                vco1.stop(0);
+                lfo.stop(0);
+                break;
+            case "reload":
+                location.reload();
+                break;
+        }
+    });
+    </script>
+  </body>
+</html>

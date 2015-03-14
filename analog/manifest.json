@@ -1,7 +1,8 @@
 {
-  "name": "Analog Synthsizer(2 Oscillator)",
-  "version": "0.1",
+  "name": "Analog Synthesizer(2 Oscillator)",
+  "version": "1.0.2",
   "manifest_version": 2,
+  "description": "Web Audio Analog Synthesizer",
   "app": {
     "background": {
       "scripts": ["js/background.js"]
