@@ -16,18 +16,18 @@ webaudio-keyboard | Mouse/Touch playable keyboard. multi-touch support.
 Chrome / Firefox / Safari / Opera / IE compatible  
 iOS and Android touch devices compatible  
 
-[Live Demo sample1 (with external image-files)](https://rawgithub.com/WebMusicDevelopersJP/webaudio-controls/master/sample1.html)  
-[Live Demo sample2 (with code example)](https://rawgithub.com/WebMusicDevelopersJP/webaudio-controls/master/sample2.html)  
-[Live Demo sample3 (Knob/Slider/Switch/Param/Keyboard default style)](https://rawgithub.com/WebMusicDevelopersJP/webaudio-controls/master/sample3.html)  
-[Live Demo sample4 (webaudio-keyboard to webMIDIAPI)](https://rawgithub.com/WebMusicDevelopersJP/webaudio-controls/master/sample4.html)  
+[Live Demo sample1 (with external image-files)](https://rawgithub.com/g200kg/webaudio-controls/master/sample1.html)  
+[Live Demo sample2 (with code example)](https://rawgithub.com/g200kg/webaudio-controls/master/sample2.html)  
+[Live Demo sample3 (Knob/Slider/Switch/Param/Keyboard default style)](https://rawgithub.com/g200kg/webaudio-controls/master/sample3.html)  
+[Live Demo sample4 (webaudio-keyboard to webMIDIAPI)](https://rawgithub.com/g200kg/webaudio-controls/master/sample4.html)  
  (need Mac+ChromeCanary+flagEnabled+MIDIdevice or Win+JazzPlugin or Mac+JazzPlugin+MidiDevice)  
 [Renoid : Practical application using webaudio-controls](http://www.g200kg.com/renoid/)  
 
 Using with external image-files.  
-[![](img/demo.png)](https://rawgithub.com/WebMusicDevelopersJP/webaudio-controls/master/sample1.html)  
+[![](img/demo.png)](https://rawgithub.com/g200kg/webaudio-controls/master/sample1.html)  
 
 Default style with no external image-files.  
-[![](img/sample3.png)](https://rawgithub.com/WebMusicDevelopersJP/webaudio-controls/master/sample3.html)  
+[![](img/sample3.png)](https://rawgithub.com/g200kg/webaudio-controls/master/sample3.html)  
 
 ## To Operate  
 Operation | Component | Description
@@ -44,36 +44,28 @@ Operation | Component | Description
 ---
 ## How to use
 
-- bower install
-
-```
-    cd webcomponents  
-    bower install
+- load polymer.html
+```html
+<link rel="import" href="./bower_components/polymer/polymer.html">
 ```
 
-- load platform.js (polymer.js will be included inside webaudio-controls.html)
-
-```
-    <script src="platform/platform.js"></script>
-```
-
-- link to webaudio-knob etc. component
-
-```
-    <link rel="import" href="webcomponents/webaudio-controls.html">
+- link to webaudio-knob component
+```html
+<link rel="import" href="webcomponents/webaudio-controls.min.html">
 ```
 
 - insert `webaudio-knob/slider/switch/param/keyboard` element
+```html
+<webaudio-knob src="img/LittlePhatty.png" sprites="100" min="0" max="100"></webaudio-knob>
+<webaudio-slider src="img/hsliderbody.png"></webaudio-slider>
+<webaudio-switch src="img/switch_toggle.png" width="32" height="32"></webaudio-switch>  
+<webaudio-param src="" link="knob-1"></webaudio-param>
+<webaudio-keyboard keys="25"></webaudio-keyboard&gt;  
+````
 
-```
-    <webaudio-knob src="img/LittlePhatty.png" sprites="100" min="0" max="100"></webaudio-knob>  
-    <webaudio-slider src="img/hsliderbody.png"></webaudio-slider>  
-    <webaudio-switch src="img/switch_toggle.png" width="32" height="32"></webaudio-switch>  
-    <webaudio-param src="" link="knob-1"></webaudio-param>  
-    <webaudio-keyboard keys="25" ></webaudio-keyboard>
-```
+### Performance
+hoge.min.html, which is vulcanized polymer element, are located in _lib_ direcotry. Use these for faster loading of polymer elements.
 
----
 ## Attributes
 
 ### webaudio-knob
@@ -197,10 +189,6 @@ keyboard.addEventListener('change', function(e) {
 
 **Note**: The addEventListener() function is recommended for event handler setup instead of 'onchange=' attribute. 'onchange=' attribute seems not work on Safari.
 
-### 'cancel'
-`webaudio-knob` | `webaudio-slider`
-**description**: 'cancel' event is emitted when end of value editing by pointing device dragging.
-
 ### 'click'  
 `webaudio-switch (kick)`  
 **description**: 'click' event is emitted if the 'kick' type webaudio-switch has clicked.
@@ -214,8 +202,8 @@ This image will be rotated from -135deg to +135deg. This approach will works wel
 
 webaudio-knob (with non zero "sprites") use a vertical 'stitched' multi-frames animation image, and webaudio-switch use a vertical 'stitched' two-frames animation image.
 For example,   
-![](https://raw.github.com/WebMusicDevelopersJP/webaudio-controls/master/img/LittlePhatty_sample.png)
-![](https://raw.github.com/WebMusicDevelopersJP/webaudio-controls/master/img/switch_toggle.png)  
+![](https://raw.github.com/g200kg/webaudio-controls/master/img/LittlePhatty_sample.png)
+![](https://raw.github.com/g200kg/webaudio-controls/master/img/switch_toggle.png)  
 
 This knob example has only 5 frames but it should has more frames for smooth animation. I recommend to use JKnobMan/WebKnobMan for making these stitched images,
 

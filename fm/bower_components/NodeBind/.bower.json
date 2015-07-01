@@ -13,11 +13,11 @@
     "test",
     "tests"
   ],
-  "_release": "404ecab279",
+  "_release": "93d2a34947",
   "_resolution": {
     "type": "branch",
     "branch": "master",
-    "commit": "404ecab279f17a714a0234d6a82617f4d2902bc7"
+    "commit": "93d2a34947cb7dc8aa11e3d3d067ecacb41bbe8b"
   },
   "_source": "git://github.com/Polymer/NodeBind.git",
   "_target": "master",
