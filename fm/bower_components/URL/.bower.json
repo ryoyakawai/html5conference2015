@@ -1,11 +1,27 @@
 {
-  "name": "URL",
+  "name": "url",
+  "main": "url.js",
   "homepage": "https://github.com/Polymer/URL",
-  "_release": "51a71e72af",
+  "authors": [
+    "https://github.com/Polymer/URL/graphs/contributors"
+  ],
+  "description": "URL parser in JavaScript",
+  "keywords": [
+    "url",
+    "urlsearchparams",
+    "whatwg",
+    "w3c"
+  ],
+  "license": "https://github.com/Polymer/URL#license",
+  "ignore": [
+    "*test*",
+    "playground.html"
+  ],
+  "_release": "79d0190f9a",
   "_resolution": {
     "type": "branch",
     "branch": "master",
-    "commit": "51a71e72af960b793f6d69507cb9648d7fab3af1"
+    "commit": "79d0190f9af6a419f46a5cc23ce312aba4f66c5c"
   },
   "_source": "git://github.com/Polymer/URL.git",
   "_target": "master",

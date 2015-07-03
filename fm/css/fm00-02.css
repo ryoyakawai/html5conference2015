@@ -7,7 +7,7 @@ select.select-preset {
   color:#000;
   overflow: hidden;
   outline: none;
-  font-size:15px; /*-webkit-small-control;*/
+  font-size:15em; /*-webkit-small-control;*/
   webkit-appearance: button;
   moz-appearance: button;
   appearance: button;
@@ -67,7 +67,7 @@ div#analyser-car01 {
 
 div#preset {
   position: absolute;
-  top:10px; right:0px;
+  top:10px; right:10px;
 }
 
 div#main-frame {
@@ -105,7 +105,7 @@ div#control-panel-top {
   position:relative;
   width:669px;
   padding:5px 15px 20px 15px;
-  z-index:1;
+  z-index:0;
   box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 }
 div#keyboard-frame {
