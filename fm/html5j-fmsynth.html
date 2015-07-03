@@ -201,6 +201,17 @@ Polymer({
             }
         }, 2000);
     },
+    // pc-keyboard
+    pcKey2NoteNo: function(no) {
+        var noteNo=0;
+        for(var i=0; i<this.pcKey.length; i++) {
+            if(no==this.pcKey[i]) {
+                noteNo=48+i;
+                break;
+            }
+        }
+        return noteNo;
+    },
     ready: function() {
         var self=this;
         // webauiod-keyboard
@@ -218,27 +229,16 @@ Polymer({
             }
         });
 
-        // pc-keyboard
-        function pcKey2NoteNo(no) {
-            var noteNo=0;
-            for(var i=0; i<this.pcKey.length; i++) {
-                if(no==this.pcKey[i]) {
-                    noteNo=48+i;
-                    break;
-                }
-            }
-            return noteNo;
-        }
-        window.document.onkeydown=function(event) {
-            var noteNo=pcKey2NoteNo(event.keyCode);
+        this.$.onkeydown=function(event) {
+            var noteNo=self.pcKey2NoteNo(event.keyCode);
             if(typeof self.isPlaying[noteNo]!="udefined" && self.isPlaying[noteNo]==true) return;
             if(noteNo==0) return;
             self.noteOn(noteNo, 80);
             self.wacKeyboard.setNote(1, noteNo);
 
         };
-        window.document.onkeyup=function(event) {
-            var noteNo=pcKey2NoteNo(event.keyCode);
+        this.$.onkeyup=function(event) {
+            var noteNo=self.pcKey2NoteNo(event.keyCode);
             if(noteNo==0) return;
             self.noteOff(noteNo);
             self.wacKeyboard.setNote(0, noteNo);

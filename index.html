@@ -5,6 +5,7 @@
 
     <script src="./bower_components/webcomponentsjs/webcomponents.js"></script>
     <link rel="import" href="./bower_components/x-webmidi/x-webmidirequestaccess.html">
+
     <link rel="import" href="./analog/bower_components/webaudio-controls/lib/webaudio-controls.min.html">
     <link rel="import" href="./analog/components/polymer_analyser.html">
     <link rel="import" href="./basic/html5j-basic.html">
@@ -18,7 +19,6 @@
 
 
     <link rel="import" href="./bower_components/paper-styles/paper-styles.html">
-    <!link rel="stylesheet" href="./bower_components/paper-styles/demo.css">
 
     <link rel="import" href="./bower_components/paper-button/paper-button.html">
     <link rel="import" href="./bower_components/paper-drawer-panel/paper-drawer-panel.html">
@@ -105,7 +105,8 @@
 
   <body unresolved>
 
-    <x-webmidirequestaccess sysex="true" input="true" output="true"></x-webmidirequestaccess>
+    <x-webmidirequestaccess input="true" output="true"></x-webmidirequestaccess>
+    <x-websocket id="websocket" url="ws://echo.websocket.org"></x-websocket>
     <paper-drawer-panel id="paperDrawerPanel" force-narrow="true" transition="true">
       <paper-header-panel drawer>
         <paper-material elevation="1">
@@ -117,9 +118,9 @@
         </paper-material>
         <div>
           <paper-menu>
-            <paper-item onclick="closeItemMenu('basic')"><iron-icon class="big" src="images/fm-icon-128.png"></iron-icon> <span style="margin-left:10px;">Basic</span></paper-item>
-            <paper-item onclick="closeItemMenu('analogsynth')"><iron-icon class="big" src="images/analog-icon-128.png"></iron-icon> <span style="margin-left:10px">アナログシンセ</span></paper-item>
-            <paper-item onclick="closeItemMenu('fmsynth')"><iron-icon class="big" src="images/fm-icon-128.png"></iron-icon> <span style="margin-left:10px;">FMシンセ</span></paper-item>
+            <paper-item id="basic" onclick="closeItemMenu('basic')"><iron-icon class="big" src="images/basic-icon-128.png"></iron-icon> <span style="margin-left:10px;">Basic</span></paper-item>
+            <paper-item id="analogsynth" onclick="closeItemMenu('analogsynth')"><iron-icon class="big" src="images/analog-icon-128.png"></iron-icon> <span style="margin-left:10px">アナログシンセ</span></paper-item>
+            <paper-item id="fmsynth" onclick="closeItemMenu('fmsynth')"><iron-icon class="big" src="images/fm-icon-128.png"></iron-icon> <span style="margin-left:10px;">FMシンセ</span></paper-item>
           </paper-menu>
         </div>
       </paper-header-panel>
@@ -137,7 +138,7 @@
         </paper-material>
         <div id="synth-area" class="parent">
           <div id="content-area" class="child">
-            <html5j-analogsynth id="initialsynth"></html5j-analogsynth>
+            <html5j-basic id="initialsynth"></html5j-basic>
           </div>
         </div>
       </paper-header-panel>
@@ -151,10 +152,17 @@
           <x-webmidiinput id="input01"></x-webmidiinput>
         </span>
       </p>
+      <p>
+        <span id="websocket">
+          <input id="wsname" placeholder="WebSocket Name">
+          <paper-button id="wsnameupdate">Update</paper-button>
+        </span>
+      </p>
       <div class="buttons">
-        <paper-button dialog-confirm autofocus>Close Dialog</paper-button>
+        <paper-button dialog-confirm autofocus>OK</paper-button>
       </div>
     </paper-dialog>
+
 
     <script>
     var pdp = document.getElementById('paperDrawerPanel');
@@ -171,8 +179,11 @@
     } (this));
 
     // item-menu
+    var add_basic_event=false; 
     function closeItemMenu(id){
       p1 = new Promise(function (resolve, reject) {
+          var json={"type":"changesynth", "itemid":id};
+          ws.send(json);
           contentarea.style.setProperty("opacity", "0");
           setTimeout(resolve, 150);
       });
@@ -181,12 +192,32 @@
           synthelem=elem;
           elem.setAttribute("eventinput00", "midiin-event:input00");
           elem.setAttribute("eventinput01", "midiin-event:input01");
+          elem.id=id;
           while(contentarea.childNodes.length>0) {
               contentarea.removeChild(contentarea.childNodes.item(0));
           }
           contentarea.style.setProperty("opacity", "1");
           contentarea.appendChild(elem);
           pdp.togglePanel();
+
+          if(id=="basic" && add_basic_event==false) {
+              document.getElementById("basic").addEventListener("vco0.type", function(){
+                  var json={"type":"vco0.type", "value":event.detail[0]};
+                  ws.send(json);
+              });
+              
+              document.body.addEventListener("vco0.frequency.value", function(){
+                  var json={"type":"vco0.frequency.value", "value":event.detail[0]};
+                  ws.send(json);
+              });
+              
+              document.getElementById("basic").addEventListener("gain0.gain.value", function(){
+                  var json={"type":"gain0.gain.value", "value":event.detail[0]};
+                  ws.send(json);
+              });
+              add_basic_event=true;
+          }
+          
       });
 
     }
@@ -201,28 +232,130 @@
         }
     });
     
-
     document.getElementById("input00").addEventListener("midiin-event:input00", handle_midievent.bind(this));
     function handle_midievent(event) {
+        if(typeof ws!="undefined") ws.send({"type":event.detail.subType, "noteNo": event.detail.property.noteNumber, "velocity":event.detail.property.velocity});
         synthelem.handle_midievent(event);
     }
     document.getElementById("input01").addEventListener("midiin-event:input01", handle_midievent.bind(this));
     function handle_midievent(event) {
+        if(typeof ws!="undefined") ws.send({"type":event.detail.subType, "noteNo": event.detail.property.noteNumber, "velocity":event.detail.property.velocity});
         synthelem.handle_midievent(event);
     }
-    window.document.onkeydown=function(event) {
+
+    window.document.onkeydown=onKeyDown.bind(this)
+    function onKeyDown(event){
         var noteNo=synthelem.pcKey2NoteNo(event.keyCode);
         if(synthelem.isPlaying[noteNo]==true) return;
         if(noteNo==0) return;
+        var json={"type":"noteOn", "noteNo":noteNo, "velocity":80};
+        ws.send(json);
         synthelem.noteOn(noteNo, 80);
-        synthelem.wacKeyboard.setNote(1, noteNo);
+        if(typeof synthelem.wacKeyboard!="undefined") synthelem.wacKeyboard.setNote(1, noteNo);
     };
-    window.document.onkeyup=function(event) {
+    window.document.onkeyup=onKeyUp.bind(this);
+    function onKeyUp(event) {
         var noteNo=synthelem.pcKey2NoteNo(event.keyCode);
         if(noteNo==0) return;
+        var json={"type":"noteOff", "noteNo":noteNo, "velocity":0};
+        ws.send(json);
         synthelem.noteOff(noteNo);
-        synthelem.wacKeyboard.setNote(0, noteNo);
+        if(typeof synthelem.wacKeyboard!="undefined") synthelem.wacKeyboard.setNote(0, noteNo);
     };
+
+
+    var wSocket=function(){
+        this.uri="ws://websocketecho.eu-gb.mybluemix.net/";
+        this.webSocket=null;
+    };
+    wSocket.prototype={
+        open: function(name) {
+            if(typeof name!="undefined") {
+                this.name=name;
+            }
+            if (this.webSocket == null) {
+                // WebSocket の初期化
+                this.webSocket = new WebSocket(this.uri);
+                // イベントハンドラの設定
+                this.webSocket.onopen = this.onOpen.bind(this);
+                this.webSocket.onmessage = this.onMessage.bind(this);
+                this.webSocket.onclose = this.onClose.bind(this);
+                this.webSocket.onerror = this.onError.bind(this);
+            }
+        },
+        onOpen: function(event) {
+            console.log("[Connected to Serverd]");
+        },
+        onMessage: function(event) {
+            if (event && event.data) {
+                var rMsg=JSON.parse(event.data);
+                if(rMsg.name=="kawai" && rMsg.name!=this.name) {
+                    console.log("[Recieved]", rMsg);
+                    switch(rMsg.type) {
+                        case "noteOn":
+                            synthelem.noteOn(rMsg.noteNo, rMsg.velocity);
+                            break;
+                        case "noteOff":
+                            synthelem.noteOff(rMsg.noteNo, rMsg.velocity);
+                            break;
+                        case "changesynth":
+                            var event = document.createEvent("MouseEvents");
+                            event.initMouseEvent("click", false, true, window,
+                                               0, 0, 0, 80, 20, false, false, false, false, 0, null);
+                            document.getElementById(rMsg.itemid).dispatchEvent(event);
+                            document.getElementById('paperDrawerPanel').togglePanel();
+                            break;
+                        case "vco0.type":
+                            document.getElementById('basic').updateValues("vco0.type", rMsg.value);
+                            break;
+                        case "vco0.frequency.value":
+                            document.getElementById('basic').updateValues("vco0.frequency.value", rMsg.value);
+                            break;
+                        case "gain0.gain.value":
+                            document.getElementById('basic').updateValues("gain0.gain.value", rMsg.value);
+                            break;
+                        case "controller":
+                            break;
+                    }
+                } else {
+                    console.log("[Echo Back]");
+                }
+            }
+        },
+        send: function(message) {
+            if(this.name!="kawai") return;
+            message["name"]=this.name;
+            var jsontext=JSON.stringify(message);
+            this.webSocket.send(jsontext);
+        },
+        // エラーイベント
+        onError: function (event) {
+            this.chat("[Error]");
+        },
+
+        close: function() {
+            this.webSocket.close(4500, "[Disconnect]");
+        },
+        onClose: function (event) {
+            this.chat("Disconnected");
+        },
+        chat: function(message) {
+            console.log("[recieved] ", message);
+        }
+        
+    };
+
+    var ws=new wSocket();
+    ws.open();
+
+    document.getElementById("wsnameupdate").addEventListener("mousedown", function(){
+        ws.close();
+        ws=null;
+        ws=new wSocket();
+        ws.open(document.getElementById("wsname").value);
+    });
+
+
     </script>
 
   </body>

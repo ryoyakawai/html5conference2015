@@ -37,6 +37,23 @@ Polymer({
     actx: null,
     anl0: null, anal1: null, vco0: null, gain0: null, lfo0: null, lfo0Gain: null,
     isPlaying: false,
+    updateValues: function(name, value) {
+        switch(name) {
+            case "vco0.type":
+                this.vco0.type=value;
+                var idx={"sine":1, "square":2, "sawtooth":3, "triangle":4};
+                this.$["type"].value=value;
+                break;
+            case "vco0.frequency.value":
+                this.vco0.frequency.value=value;
+                this.$["freq"].value=value;
+                break;
+            case "gain0.gain.value":
+                this.gain0.gain.value=value;
+                this.$["gain"].value=value;
+                break;
+        }
+    },
     ready: function() {
         this.start=this.$["start"];
         this.stop=this.$["stop"];
@@ -51,12 +68,18 @@ Polymer({
 
         this.type.addEventListener("change", function(event){
             self.vco0.type=event.target.value;
+            self.fire("vco0.type", [event.target.value]);
         });
         this.freq.addEventListener("change", function(event){
-            if(typeof self.vco0!="undefined") self.vco0.frequency.value=event.target.value;
+            console.log(self.vco0);
+            if(typeof self.vco0!="undefined") {
+                self.vco0.frequency.value=event.target.value;
+                self.fire("vco0.frequency.value", [event.target.value]);
+            }
         });
         this.gain.addEventListener("change", function(event){
             self.gain0.gain.value=event.target.value;
+            self.fire("gain0.gain.value", [event.target.value]);
         });
         this.start.addEventListener("mousedown", this.noteOn.bind(this));
         this.stop.addEventListener("mouseup", this.noteOff.bind(this));
@@ -78,7 +101,9 @@ Polymer({
         this.vco0.stop(0);
         this.isPlaying=false;
     },
-    noteOn: function() {
+    noteOn: function(noteNo, status) {
+        if(this.isPlaying==true) return;
+
         this.anl0=this.actx.createAnalyser();
         this.anl1=this.actx.createAnalyser();
 
