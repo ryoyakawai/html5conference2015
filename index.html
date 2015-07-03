@@ -1,0 +1,229 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+
+    <script src="./bower_components/webcomponentsjs/webcomponents.js"></script>
+    <link rel="import" href="./bower_components/x-webmidi/x-webmidirequestaccess.html">
+    <link rel="import" href="./analog/bower_components/webaudio-controls/lib/webaudio-controls.min.html">
+    <link rel="import" href="./analog/components/polymer_analyser.html">
+    <link rel="import" href="./basic/html5j-basic.html">
+    <link rel="import" href="./analog/html5j-analogsynth.html">
+    <link rel="import" href="./fm/html5j-fmsynth.html">
+
+    <link rel="import" href="./bower_components/iron-icons/iron-icons.html">
+    <link rel="import" href="./bower_components/paper-icon-button/paper-icon-button.html">
+    <link rel="import" href="./bower_components/paper-styles/paper-styles.html">
+    <link rel="import" href="./bower_components/paper-toolbar/paper-toolbar.html">
+
+
+    <link rel="import" href="./bower_components/paper-styles/paper-styles.html">
+    <!link rel="stylesheet" href="./bower_components/paper-styles/demo.css">
+
+    <link rel="import" href="./bower_components/paper-button/paper-button.html">
+    <link rel="import" href="./bower_components/paper-drawer-panel/paper-drawer-panel.html">
+
+    <link rel="import" href="./bower_components/paper-button/paper-button.html">
+    <link rel="import" href="./bower_components/paper-drawer-panel/paper-drawer-panel.html">
+
+    <link rel="import" href="./bower_components/paper-item/paper-item.html">
+    <link rel="import" href="./bower_components/paper-menu/paper-menu.html">
+
+    <link rel="import" href="./bower_components/paper-item/paper-item.html">
+    <link rel="import" href="./bower_components/paper-item/paper-item-body.html">
+    <link rel="import" href="./bower_components/paper-item/paper-icon-item.html">
+
+    <link rel="import" href="./bower_components/iron-icon/iron-icon.html">
+    <link rel="import" href="./bower_components/iron-iconset/iron-iconset.html">
+
+    <link rel="import" href="./bower_components/paper-fab/paper-fab.html">
+
+    <link rel="import" href="./bower_components/paper-dialog/paper-dialog.html">
+
+
+    <style is="custom-style">
+    body {
+      margin:0px;
+      padding:0px;
+      background-color:var(--google-grey-100);
+      font-family: arial;
+      font-size:1em;
+    }
+    paper-toolbar + paper-toolbar {
+      margin-top: 20px;
+    }
+    #synth-area {
+      position:relative;
+      left:20px;
+      top:20px;
+      margin:20px 40px 60px 40px;
+    }
+
+    #content-area {
+      transition:0.2s;
+      opacity:1.0;
+    }
+
+    #paperDrawerPanel {
+      overflow: scroll;
+    }
+    paper-button {
+      color: white;
+      margin: 10px;
+      background-color: var(--google-blue-700);
+      white-space: nowrap;
+    }
+    paper-item:hover {
+      cursor: pointer;
+    }
+
+    .parent {
+      position: absolute;
+      left:0px
+      width: 100%;
+    }
+
+    .child {
+      position: relative;
+      width: 750px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    paper-fab.white {
+      --paper-fab-background: #fff;
+      --paper-fab-keyboard-focus-background: #fff;
+    }
+    #midifab {
+      position:absolute;
+      right:0px;
+      margin:30px;
+    }
+
+    </style>
+  </head>
+
+  <body unresolved>
+
+    <x-webmidirequestaccess sysex="true" input="true" output="true"></x-webmidirequestaccess>
+    <paper-drawer-panel id="paperDrawerPanel" force-narrow="true" transition="true">
+      <paper-header-panel drawer>
+        <paper-material elevation="1">
+          <paper-toolbar>
+            <div>
+              <span>HTML5 Conf. 2015 鹿児島</span>
+            </div>
+          </paper-toolbar>
+        </paper-material>
+        <div>
+          <paper-menu>
+            <paper-item onclick="closeItemMenu('basic')"><iron-icon class="big" src="images/fm-icon-128.png"></iron-icon> <span style="margin-left:10px;">Basic</span></paper-item>
+            <paper-item onclick="closeItemMenu('analogsynth')"><iron-icon class="big" src="images/analog-icon-128.png"></iron-icon> <span style="margin-left:10px">アナログシンセ</span></paper-item>
+            <paper-item onclick="closeItemMenu('fmsynth')"><iron-icon class="big" src="images/fm-icon-128.png"></iron-icon> <span style="margin-left:10px;">FMシンセ</span></paper-item>
+          </paper-menu>
+        </div>
+      </paper-header-panel>
+      <paper-header-panel main>
+        <paper-material elevation="1">
+          <paper-toolbar>
+            <div>
+              <div id="midifab">
+                <paper-fab id="midi-setting" src="images/midi_logo.png" tabindex="0" class="white" data-dialog="midi-setting"></paper-fab>
+              </div>
+              <paper-icon-button icon="menu" onclick="flipDrawer()"></paper-icon-button>
+              <span>Web Audio/MIDI Application</span>
+            </div>
+          </paper-toolbar>
+        </paper-material>
+        <div id="synth-area" class="parent">
+          <div id="content-area" class="child">
+            <html5j-analogsynth id="initialsynth"></html5j-analogsynth>
+          </div>
+        </div>
+      </paper-header-panel>
+    </paper-drawer-panel>
+
+    <paper-dialog id="midisettingdialog" modal>
+      <h2>Select MIDI Input Device</h2>
+      <p>
+        <span id="midiinput">
+          <x-webmidiinput id="input00"></x-webmidiinput>
+          <x-webmidiinput id="input01"></x-webmidiinput>
+        </span>
+      </p>
+      <div class="buttons">
+        <paper-button dialog-confirm autofocus>Close Dialog</paper-button>
+      </div>
+    </paper-dialog>
+
+    <script>
+    var pdp = document.getElementById('paperDrawerPanel');
+    var contentarea = document.getElementById('content-area');
+    var synthelem=document.getElementById('initialsynth');
+    (function(global) {
+        'use strict';
+
+        // drawer open/close
+        global.flipDrawer = function() {
+            pdp.togglePanel();
+        }
+        
+    } (this));
+
+    // item-menu
+    function closeItemMenu(id){
+      p1 = new Promise(function (resolve, reject) {
+          contentarea.style.setProperty("opacity", "0");
+          setTimeout(resolve, 150);
+      });
+      p1.then(function(){
+          var elem=document.createElement("html5j-"+id);
+          synthelem=elem;
+          elem.setAttribute("eventinput00", "midiin-event:input00");
+          elem.setAttribute("eventinput01", "midiin-event:input01");
+          while(contentarea.childNodes.length>0) {
+              contentarea.removeChild(contentarea.childNodes.item(0));
+          }
+          contentarea.style.setProperty("opacity", "1");
+          contentarea.appendChild(elem);
+          pdp.togglePanel();
+      });
+
+    }
+
+    // fab midi setting
+    document.getElementById("midi-setting").addEventListener("click", function(event){
+        var id = "midisettingdialog";
+        var dialog = document.getElementById(id);
+        if (dialog) {
+            dialog.toggle();
+            event.target.toggleAttribute && event.target.toggleAttribute('data-dialog-opened', dialog.opened);
+        }
+    });
+    
+
+    document.getElementById("input00").addEventListener("midiin-event:input00", handle_midievent.bind(this));
+    function handle_midievent(event) {
+        synthelem.handle_midievent(event);
+    }
+    document.getElementById("input01").addEventListener("midiin-event:input01", handle_midievent.bind(this));
+    function handle_midievent(event) {
+        synthelem.handle_midievent(event);
+    }
+    window.document.onkeydown=function(event) {
+        var noteNo=synthelem.pcKey2NoteNo(event.keyCode);
+        if(synthelem.isPlaying[noteNo]==true) return;
+        if(noteNo==0) return;
+        synthelem.noteOn(noteNo, 80);
+        synthelem.wacKeyboard.setNote(1, noteNo);
+    };
+    window.document.onkeyup=function(event) {
+        var noteNo=synthelem.pcKey2NoteNo(event.keyCode);
+        if(noteNo==0) return;
+        synthelem.noteOff(noteNo);
+        synthelem.wacKeyboard.setNote(0, noteNo);
+    };
+    </script>
+
+  </body>
+</html>

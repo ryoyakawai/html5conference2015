@@ -1,0 +1,186 @@
+<dom-module id="html5j-basic">
+  <link rel="import" type="css" href="./css/02.css">
+  <template>
+    <div></div>
+
+    <polymer-analyser id="xanalyser00"></polymer-analyser>
+    <polymer-analyser id="xanalyser01"></polymer-analyser>
+    <div id="container">
+      <button id="start">START</button>
+      <button id="stop">STOP</button>
+      <div id="figure00" style="border:1px solid #ddd;">
+        <div id="analyser00"></div>
+        <div id="analyser01"></div>
+        <div id="div-freq"><input id="freq" type="number" min="240" max="4100" step="10" value="460"></div>
+        <div id="div-type">
+          <select id="type" type="select">
+            <option value="sine">sine</option>
+            <option value="square">square</option>
+            <option value="sawtooth" selected>sawtooth</option>
+            <option value="triangle">triangle</option>
+          </select>
+        </div>
+        <div id="div-gain"><input id="gain" type="number" min="0" max="1" step="0.1" value="0.3"></div>
+      </div>
+    </div>
+  </template>
+</dom-module>
+<script>
+Polymer({
+    is: "html5j-basic",
+    pcKey: [65, 87, 83, 69, 68, 70, 84, 71, 89, 72, 85, 74, 75, 79, 76, 80, 186, 222, 221],
+    start: null,
+    stop: null,
+    freq: null,
+    type: null,
+    gain: null,
+    actx: null,
+    anl0: null, anal1: null, vco0: null, gain0: null, lfo0: null, lfo0Gain: null,
+    isPlaying: false,
+    ready: function() {
+        this.start=this.$["start"];
+        this.stop=this.$["stop"];
+        this.freq=this.$["freq"];
+        this.type=this.$["type"];
+        this.gain=this.$["gain"];
+
+        this.actx=new AudioContext();
+        this.isPlaying=false;
+
+        var self=this;
+
+        this.type.addEventListener("change", function(event){
+            self.vco0.type=event.target.value;
+        });
+        this.freq.addEventListener("change", function(event){
+            if(typeof self.vco0!="undefined") self.vco0.frequency.value=event.target.value;
+        });
+        this.gain.addEventListener("change", function(event){
+            self.gain0.gain.value=event.target.value;
+        });
+        this.start.addEventListener("mousedown", this.noteOn.bind(this));
+        this.stop.addEventListener("mouseup", this.noteOff.bind(this));
+    },
+    // pc-keyboard
+    pcKey2NoteNo: function(no) {
+        var noteNo=0;
+        for(var i=0; i<this.pcKey.length; i++) {
+            if(no==this.pcKey[i]) {
+                noteNo=48+i;
+                break;
+            }
+        }
+        return noteNo;
+    },
+    noteOff: function() {
+        this.$["analyser00"].innerHTML="";
+        this.$["analyser01"].innerHTML="";
+        this.vco0.stop(0);
+        this.isPlaying=false;
+    },
+    noteOn: function() {
+        this.anl0=this.actx.createAnalyser();
+        this.anl1=this.actx.createAnalyser();
+
+        this.vco0=this.actx.createOscillator();
+        this.gain0=this.actx.createGain();
+
+        this.vco0.connect(this.gain0);
+        this.gain0.connect(this.actx.destination);
+
+        this.vco0.type=this.type.value;
+
+        this.vco0.frequency.value=this.freq.value;
+        this.gain0.gain.value=this.gain.value;
+
+        this.vco0.connect(this.anl0);
+        this.al0=this.$["xanalyser00"];
+        this.al0.setParams(this.anl0, "l_byCount", 185, 119, 360);
+        this.al0.runAnalyser();
+        this.$["analyser00"].appendChild(this.al0.getCanvas());
+
+        this.gain0.connect(this.anl1);
+        this.al1=this.$["xanalyser01"];
+        this.al1.setParams(this.anl1, "l_byCount", 265, 119, 360);
+        this.al1.runAnalyser();
+        this.$["analyser01"].appendChild(this.al1.getCanvas());
+
+        this.vco0.start(0);
+        this.isPlaying=true;
+    },
+    handle_midievent: function(event) {
+        var property=event.detail.property;
+        switch(property.subType) {
+            case "noteOn":
+                if(typeof this.isPlaying[property.noteNumber]!="udefined" && this.isPlaying[property.noteNumber]==true) return;
+                this.noteOn(property.noteNumber, property.velocity);
+                break;
+            case "noteOff":
+                this.noteOff(property.noteNumber);
+                break;
+            case "pitchBend":
+                if(typeof this.car[property.noteNumber]!="undefined") this.car[property.noteNumber].detune.value=property.value/10;
+                break;
+            case "controller":
+                var param={"target":{"value": property.value}};
+                this.selectedPreset=parseInt((this.presetList.length-0.01)*(property.value/127));
+                var options=document.querySelector(".select-preset").options;
+                for(var i=0; i<options.length; i++) {
+                    options[i].selected=false;
+                    if(options[i].value==this.selectedPreset) {
+                        options[i].selected=true;
+                }
+            }
+            break;
+        }
+    }
+});
+
+
+/*
+window.addEventListener("keydown", function(event) {
+    //console.log(event.keyCode);
+    if(isPlaying==true) {
+        switch(event.keyCode) {
+            case 49: // 1
+                type.value="sine";
+                break;
+            case 50: // 2
+                type.value="square";
+                break;
+            case 51: // 3
+                type.value="sawtooth";
+                break;
+            case 52: // 4
+                type.value="triangle";
+                break;
+        }
+        var e=document.createEvent("MouseEvents");
+        e.initEvent("change", false, true);
+        type.dispatchEvent(e);
+    }
+    switch(event.keyCode) {
+        case 68: // d
+            var imgStatus=document.getElementById("figure00");
+            if(imgStatus.className=="hide") {
+                imgStatus.className="";
+        } else {
+                imgStatus.className="hide";
+        }
+        break;
+        case 32: // [space]
+        var e=document.createEvent("MouseEvents");
+        if(isPlaying==false) {
+            e.initEvent("mousedown", false, true);
+            document.getElementById("start").dispatchEvent(e);
+            isPlaying=true;
+        } else {
+            e.initEvent("mouseup", false, true);
+            document.getElementById("stop").dispatchEvent(e);
+            isPlaying=false;
+        }
+        break;
+    }
+});
+*/
+</script>

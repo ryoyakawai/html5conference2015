@@ -1,0 +1,513 @@
+<dom-module id="html5j-analogsynth">
+  <link rel="import" type="css" href="./css/osc2-00.css">
+  <template>
+    <div></div>
+
+    <polymer-analyser id="p-vco00" offsety="20"></polymer-analyser>
+    <polymer-analyser id="p-vco01" offsety="20"></polymer-analyser>
+    <polymer-analyser id="p-vcf00" offsety="20"></polymer-analyser>
+    <polymer-analyser id="p-lfo00" offsety="20"></polymer-analyser>
+    <polymer-analyser id="p-vcf01" offsety="20"></polymer-analyser>
+    <polymer-analyser id="p-mediastream" offsety="20"></polymer-analyser>
+
+    <div id="main-frame">
+      <div id="control-panel-top">
+        <div id="control-panel">
+          <div id="synth00-title"></div>
+          <div id="synth00-frame">
+            <div id="synth00-controls">
+              <div id="lfo0gain-knob" class="knob"><webaudio-knob id="knob-lfo0gain0" src="./images/flatknob3.png" sprites="30" value="1" min="0" max="30" step="0.5" diameter="35"></webaudio-knob></div>
+              <div id="lfo1gain-knob" class="knob"><webaudio-knob id="knob-lfo0gain1" src="./images/flatknob3.png" sprites="30" value="7" min="0" max="30" step="0.5" diameter="35"></webaudio-knob></div>
+              <div id="vco1detune-knob" class="knobs"><webaudio-knob id="knob-vco1detune" src="./images/flatknob3s-blue.png" sprites="30" value="0" min="-100" max="100" step="0.5" diameter="25"></webaudio-knob></div>
+              <div id="modvcf0gain-knob" class="knob"><webaudio-knob id="knob-modvcf0gain" src="./images/flatknob3.png" sprites="30" value="50" min="0" max="1000" step="0.5" diameter="35"></webaudio-knob></div>
+              <div id="lfo0freq-slider"><input id="slider-lfo0freq" type="range" min="0" max="50" step="0.5" value="3" style="width:149px;"></div>
+              <div id="vcf0freq-slider"><input id="slider-vcf0freq" type="range" min="0" max="3000" step="0.5" value="1000"></div>
+              <div id="vcf0q-knob" class="knob"><webaudio-knob id="knob-vcf0q" src="./images/flatknob3.png" sprites="30" value="1" min="0" max="30" step="0.5" diameter="35"></webaudio-knob></div>
+              <div id="vca0gain-knob" class="knob"><webaudio-knob id="knob-vca0gain" src="./images/flatknob3.png" sprites="30" value="0.5" min="0" max="1" step="0.05" diameter="35"></webaudio-knob></div>
+              <div id="analyser-vco00"></div>
+              <div id="analyser-vco01"></div>
+              <div id="analyser-vcf00"></div>
+              <div id="analyser-lfo00"></div>
+              <div id="analyser-vcf01"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="keyboard-frame">
+        <webaudio-keyboard id="keyboard" width="699" height="150" min="48" keys="35" style="position:relative;"></webaudio-keyboard>
+      </div>
+    </div>
+  </template>
+</dom-module>
+<script type="text/javascript">
+Polymer({
+    is: "html5j-analogsynth",
+    pcKey: [65, 87, 83, 69, 68, 70, 84, 71, 89, 72, 85, 74, 75, 79, 76, 80, 186, 222, 221],
+    isPlaying: [],
+    velocityGain: [],
+    ctxa: null,
+    vca: null,
+    vco0: null,
+    vco0:[], vco1:[], 
+    lfo:[], 
+    vcf0:[], vco0Gain:[], 
+    vco1Gain:[], 
+    modVcfGain:[], 
+    lfo0Gain:[], lfo1Gain:[],
+    oscType:["sine", "square", "sawtooth", "triangle"],
+    attack:0.5, decay:0.5, sustain:0.5, release:0.5,
+    analyserVco0:null, analyserVco1:null, 
+    analyserVcf0:null, analyserLfo:null, analyserVcf1:null,
+    lfo0freq:null, lfo0gain0:null, lfo0gain1:null,
+    vca0gain:null, vco1detune:null, vco0Type:null, 
+    vco1Type:null,
+    vcoType:[2, 2],
+    vcf0freq:null, vcf0q:null, modvcf0gain:null,
+    target0:null, target1:null,
+    al0:null, al1:null, al2:null, al3:null, al4:null,
+    wacKeyboard:null,
+    handle_midievent: function(event) {
+        var property=event.detail.property;
+        switch(property.subType) {
+            case "noteOn":
+                if(this.isPlaying[property.noteNumber]==true) return;
+                this.noteOn.bind(this)(property.noteNumber, property.velocity);
+                this.wacKeyboard.setNote(1, property.noteNumber);
+                break;
+            case "noteOff":
+                this.noteOff.bind(this)(property.noteNumber);
+                this.wacKeyboard.setNote(0, property.noteNumber);
+                break;
+            case "controller":
+                var param={"target":{"value": property.value}};
+                // 0:vco0.type, 1:vco1.type
+                // 3:lfo0freq, 4:vcf0freq
+                // 16:lfo0gain0, 17:lfo0gain1, 18:vco1detune
+                // 19:modvcf0gain, 20:vcf0q, 21:vca0gain
+                switch(property.ctrlNo) {
+                case 0:
+                    param.target.value=param.target.value/127;
+                    this.vcoType[0]=updateOscType(param.target.value);
+                    break;
+                case 1:
+                    param.target.value=param.target.value/127;
+                    this.vcoType[1]=updateOscType(param.target.value);
+                    break;
+                case 3:
+                    param.target.value=50*(param.target.value/127);
+                    moveKnob.bind(this)("slider-lfo0freq", param.target.value);
+                    this.ctrl_lfo0freq.bind(this)(param);
+                    break;
+                case 4:
+                    param.target.value=3000*(param.target.value/127);
+                    moveKnob.bind(this)("slider-vcf0freq", param.target.value);
+                    this.ctrl_vcf0freq.bind(this)(param);
+                    break;
+                case 17:
+                    param.target.value=30*(param.target.value/127);
+                    moveKnob.bind(this)("knob-lfo0gain1", param.target.value);
+                    this.ctrl_lfo0gain1.bind(this)(param);
+                    break;
+                case 16:
+                    param.target.value=30*(param.target.value/127);
+                    moveKnob.bind(this)("knob-lfo0gain0", param.target.value);
+                    this.ctrl_lfo0gain0.bind(this)(param);
+                    break;
+                case 17:
+                    param.target.value=30*(param.target.value/127);
+                    moveKnob.bind(this)("knob-lfo0gain1", param.target.value);
+                    this.ctrl_lfo0gain1.bind(this)(param);
+                    break;
+                case 18:
+                    param.target.value=200*((param.target.value/127)-0.5);
+                    moveKnob.bind(this)("knob-vco1detune", param.target.value);
+                    this.ctrl_vco1detune.bind(this)(param);
+                    break;
+                case 19:
+                    param.target.value=1000*(param.target.value/127);
+                    moveKnob.bind(this)("knob-modvcf0gain", param.target.value);
+                    this.ctrl_modvcf0gain.bind(this)(param);
+                    break;
+                case 20:
+                    param.target.value=30*(param.target.value/(127));
+                    moveKnob.bind(this)("knob-vcf0q", param.target.value);
+                    this.ctrl_vcf0q.bind(this)(param);
+                    break;
+                case 21:
+                    param.target.value=param.target.value/(127);
+                    moveKnob.bind(this)("knob-vca0gain", param.target.value);
+                    this.ctrl_vca0gain.bind(this)(param);
+                    break;
+            }
+            break;
+        }
+        function updateOscType(val) {
+            return parseInt(4.9*val);
+        }
+        function moveKnob(name, param) {
+            //document.getElementById(name).value=param;
+            this.$[name].value=param;
+        }
+    },
+    // pc-keyboard
+    pcKey2NoteNo: function(no) {
+        var noteNo=0;
+        for(var i=0; i<this.pcKey.length; i++) {
+            if(no==this.pcKey[i]) {
+                noteNo=48+i;
+                break;
+            }
+        }
+        return noteNo;
+    },
+    noteOn: function (noteNo, velocity, type) {
+        if(this.isPlaying[noteNo]==true) return;
+        
+        var freq=440.0 * Math.pow(2.0, (noteNo - 69.0) / 12.0);
+
+        this.velocityGain[noteNo]=this.ctxa.createGain();
+        this.velocityGain[noteNo].gain.value=velocity/127;
+        this.isPlaying[noteNo]=true;
+
+        this.vco0[noteNo]=this.ctxa.createOscillator();
+        this.vco0Gain[noteNo]=this.ctxa.createGain();
+
+        this.vco1[noteNo]=this.ctxa.createOscillator();
+        this.vco1Gain[noteNo]=this.ctxa.createGain();
+        
+        this.vcf0[noteNo]=this.ctxa.createBiquadFilter();
+
+        this.lfo[noteNo]=this.ctxa.createOscillator();
+        this.lfo0Gain[noteNo]=this.ctxa.createGain();
+        this.lfo1Gain[noteNo]=this.ctxa.createGain();
+
+        this.modVcfGain[noteNo]=this.ctxa.createGain();
+
+        this.vco0[noteNo].frequency.value=freq;
+        this.vco1[noteNo].frequency.value=freq;
+        
+        // initial values
+        this.lfo[noteNo].frequency.value=this.lfo0freq.value;
+        this.lfo0Gain[noteNo].gain.value=this.lfo0gain0.value;
+        this.lfo1Gain[noteNo].gain.value=this.lfo0gain1.value;
+        
+        this.vco0[noteNo].type=this.oscType[this.vcoType[0]];
+        this.vco0[noteNo].detune.value=0;
+
+        this.vco1[noteNo].type=this.oscType[this.vcoType[1]];
+        this.vco1[noteNo].detune.value=-5;
+
+        this.vcf0[noteNo].frequency.value=this.vcf0freq.value;
+        this.vcf0[noteNo].Q.value=this.vcf0q.value;
+        this.modVcfGain[noteNo].gain.value=this.modvcf0gain.value;
+        
+        // connect vcoGain
+        this.vco0[noteNo].connect(this.vco0Gain[noteNo]);
+        this.vco0Gain[noteNo].connect(this.velocityGain[noteNo]);
+        this.vco1[noteNo].connect(this.vco1Gain[noteNo]);
+        this.vco1Gain[noteNo].connect(this.velocityGain[noteNo]);
+        
+        // connect analyser to vco
+        this.analyserVco0=this.ctxa.createAnalyser();
+        this.vco0Gain[noteNo].connect(this.analyserVco0);
+        this.analyserVco1=this.ctxa.createAnalyser();        
+        this.vco1Gain[noteNo].connect(this.analyserVco1);
+
+        // connect vco to vcf 
+        this.velocityGain[noteNo].connect(this.vcf0[noteNo]);
+        
+        // connect lfo to vcfGain
+        this.lfo[noteNo].connect(this.modVcfGain[noteNo]);
+
+        this.analyserLfo=this.ctxa.createAnalyser();
+        this.lfo[noteNo].connect(this.analyserLfo);
+
+        // connect vcfgain to vcf detune
+        this.modVcfGain[noteNo].connect(this.vcf0[noteNo].detune);
+
+        // connect lfo to lfoGain
+        this.lfo[noteNo].connect(this.lfo0Gain[noteNo]);
+
+        // connect lfoGain to vco frequency
+        this.lfo0Gain[noteNo].connect(this.vco0[noteNo].frequency);
+        this.lfo1Gain[noteNo].connect(this.vco1[noteNo].frequency);
+        
+        // connect vcf to vca
+        this.vcf0[noteNo].connect(this.vca);
+        this.analyserVcf0=this.ctxa.createAnalyser();
+        this.vcf0[noteNo].connect(this.analyserVcf0);
+        
+        // connect vca to destination
+        this.vca.connect(this.ctxa.destination);
+        
+        this.vco0[noteNo].start(0);
+        this.vco1[noteNo].start(0);
+        this.lfo[noteNo].start(0);
+
+        var now=this.ctxa.currentTime;
+        var rootValue0=this.vco0Gain[noteNo].gain.value;
+        var rootValue1=this.vco1Gain[noteNo].gain.value;
+        
+        switch(type) {
+            case "update": 
+                break;
+            default:
+                this.target0=this.vco0Gain[noteNo].gain;
+                this.target0.cancelScheduledValues(0);
+                
+                this.target0.setValueAtTime(0.0, now);
+                this.target0.linearRampToValueAtTime(rootValue0, now + this.attack);
+                this.target0.linearRampToValueAtTime(this.sustain * rootValue0, now + this.attack + this.decay);
+                
+                this.target1=this.vco1Gain[noteNo].gain;
+                this.target1.cancelScheduledValues(0);        
+                this.target1.setValueAtTime(0.0, now);
+                this.target1.linearRampToValueAtTime(rootValue1, now + this.attack);
+                this.target1.linearRampToValueAtTime(this.sustain * rootValue1, now + this.attack + this.decay);
+                break;
+        }
+
+        // analyser:graph
+        this.al0.setParams(this.analyserVcf0, "l_byCount", 147, 95, 360);
+        this.al0.runAnalyser();
+        //document.getElementById("analyser-vcf00").innerHTML="";
+        //document.getElementById("analyser-vcf00").appendChild(al0.getCanvas());
+        this.$["analyser-vcf00"].innerHTML="";
+        this.$["analyser-vcf00"].appendChild(this.al0.getCanvas());
+        
+        this.al1.setParams(this.analyserVco0, "l_byCount", 147, 95, 360);
+        this.al1.runAnalyser();
+        //document.getElementById("analyser-vco00").innerHTML="";
+        //document.getElementById("analyser-vco00").appendChild(al1.getCanvas());
+        this.$["analyser-vco00"].innerHTML="";
+        this.$["analyser-vco00"].appendChild(this.al1.getCanvas());
+        
+        this.al2.setParams(this.analyserVco1, "l_byCount", 147, 95, 360);
+        this.al2.runAnalyser();
+        //document.getElementById("analyser-vco01").innerHTML="";
+        //document.getElementById("analyser-vco01").appendChild(al2.getCanvas());
+        this.$["analyser-vco01"].innerHTML="";
+        this.$["analyser-vco01"].appendChild(this.al2.getCanvas());
+        
+        this.al3.setParams(this.analyserLfo, "l_byCount", 147, 95, 360);
+        this.al3.runAnalyser();
+        //document.getElementById("analyser-lfo00").innerHTML="";
+        //document.getElementById("analyser-lfo00").appendChild(al3.getCanvas());
+        this.$["analyser-lfo00"].innerHTML="";
+        this.$["analyser-lfo00"].appendChild(this.al3.getCanvas());
+        
+        this.al4.setParams(this.analyserVcf0, "l_byData", 147, 95, 360);
+        this.al4.runAnalyser();
+        //document.getElementById("analyser-vcf01").innerHTML="";
+        //document.getElementById("analyser-vcf01").appendChild(al4.getCanvas());
+        this.$["analyser-vcf01"].innerHTML="";
+        this.$["analyser-vcf01"].appendChild(this.al4.getCanvas());
+    },   
+    noteOff: function (noteNo, time) {
+        if(this.isPlaying[noteNo]==false) return;
+        
+        // envelope
+        var now=this.ctxa.currentTime;
+        this.target0=this.vco0Gain[noteNo].gain;
+        this.target1=this.vco1Gain[noteNo].gain;
+
+        this.target0.cancelScheduledValues(0);
+        this.target1.cancelScheduledValues(0);
+        this.target0.setValueAtTime(this.target0.value, now);
+        this.target0.linearRampToValueAtTime(0.0, now + this.release);
+        this.target1.setValueAtTime(this.target1.value, now);
+        this.target1.linearRampToValueAtTime(0.0, now + this.release);
+
+        this.vco0[noteNo].stop(now + this.release);
+        this.vco1[noteNo].stop(now + this.release); 
+        this.lfo[noteNo].stop(now + this.release);
+
+        var self=this;
+        setTimeout(function() {
+            self.isPlaying[noteNo]=false;
+            delete self.vco0[noteNo];
+            delete self.vco1[noteNo];
+            delete self.lfo[noteNo];
+            delete self.vcf0[noteNo];
+            delete self.vco0Gain[noteNo];
+            delete self.vco1Gain[noteNo];
+            delete self.modVcfGain[noteNo];
+            delete self.lfo0Gain[noteNo];
+            delete self.lfo1Gain[noteNo];
+            delete self.velocityGain[noteNo];
+        }, now + this.release);
+
+        setTimeout(function() {
+            var tCnt=0;
+            for(var i=21; i<109; i++) {
+                if(self.isPlaying[i]==true) tCnt++;
+            }
+            if(tCnt<1) {
+                self.al0.cancelTimer();
+                self.al1.cancelTimer();
+                self.al2.cancelTimer();
+                self.al3.cancelTimer();
+                self.al4.cancelTimer();
+            }
+        }, this.release*2000);
+    },
+
+
+    ctrl_modvcf0gain: function (event) {
+        for(var i=21; i<109; i++) {
+            if(this.isPlaying[i]==true) {
+                this.modVcfGain[i].gain.value=event.target.value;
+            }
+        }
+    },
+    ctrl_vcf0freq: function (event){
+        for(var i=21; i<109; i++) {
+            if(this.isPlaying[i]==true) {
+                this.vcf0[i].frequency.value=event.target.value;
+            }
+        }
+    },
+    ctrl_vcf0q: function (event){
+        for(var i=21; i<109; i++) {
+            if(this.isPlaying[i]==true) {
+                this.vcf0[i].Q.value=event.target.value;
+            }
+        }
+    },
+    ctrl_lfo0freq: function (event) {
+        for(var i=21; i<109; i++) {
+            if(this.isPlaying[i]==true) {
+                this.lfo[i].frequency.value=event.target.value;
+            }
+        }
+    },
+    ctrl_lfo0gain0: function (event) {
+        for(var i=21; i<109; i++) {
+            if(this.isPlaying[i]==true) {
+                this.lfo0Gain[i].gain.value=event.target.value;
+            }
+        }
+    },
+    ctrl_lfo0gain1: function (event) {
+        for(var i=21; i<109; i++) {
+            if(this.isPlaying[i]==true) {
+                this.lfo1Gain[i].gain.value=event.target.value;
+            }
+        }
+    },
+    ctrl_vca0gain: function (event) {
+        this.vca.gain.value=event.target.value;
+    },
+    ctrl_vco1detune: function (event) {
+        for(var i=21; i<109; i++) {
+            if(this.isPlaying[i]==true) {
+                this.vco1[i].detune.value=event.target.value;
+            }
+        }
+    },
+    ctrl_detuneset0: function (){
+        for(var i=21; i<109; i++) {
+            if(this.isPlaying[i]==true) {
+                this.vco1[i].detune.value=0;
+            }
+        }
+    },
+
+    ready: function() {
+        
+        var self=this;
+        // webauiod-keyboard
+        //var wacKeyboard=document.getElementById("keyboard");
+        this.wacKeyboard=this.$["keyboard"];
+        this.wacKeyboard.addEventListener("change", function(event){
+            var note=event.note;
+            switch(note[0]) {
+                case 0:
+                    self.noteOff(note[1]);
+                    break;
+                case 1:
+                    if(self.isPlaying[note[1]]==true) return;
+                    self.noteOn(note[1], 100);
+                    break;
+            }
+        });
+
+        //window.document.onkeydown=function(event) {
+        this.$.onkeydown=function(event) {
+            var noteNo=pcKey2NoteNo(event.keyCode);
+            if(this.isPlaying[noteNo]==true) return;
+            if(noteNo==0) return;
+            self.noteOn(noteNo, 80);
+            self.wacKeyboard.setNote(1, noteNo);
+        };
+        //window.document.onkeyup=function(event) {
+        this.$.onkeyup=function(event) {
+            var noteNo=pcKey2NoteNo(event.keyCode);
+            if(noteNo==0) return;
+            self.noteOff(noteNo);
+            self.wacKeyboard.setNote(0, noteNo);
+        };
+
+        // ui
+        //var modvcf0gain=document.getElementById("knob-modvcf0gain");
+        this.modvcf0gain=this.$["knob-modvcf0gain"];
+        this.modvcf0gain.addEventListener("change", this.ctrl_modvcf0gain.bind(this));
+
+        //var vcf0freq=document.getElementById("slider-vcf0freq");
+        this.vcf0freq=this.$["slider-vcf0freq"];
+        this.vcf0freq.addEventListener("change", this.ctrl_vcf0freq.bind(this));
+
+        //var vcf0q=document.getElementById("knob-vcf0q");
+        this.vcf0q=this.$["knob-vcf0q"];
+        this.vcf0q.addEventListener("change", this.ctrl_vcf0q.bind(this));
+
+        //var lfo0freq=document.getElementById("slider-lfo0freq");
+        this.lfo0freq=this.$["slider-lfo0freq"];
+        this.lfo0freq.addEventListener("change", this.ctrl_lfo0freq.bind(this));
+
+        //var lfo0gain0=document.getElementById("knob-lfo0gain0");
+        this.lfo0gain0=this.$["knob-lfo0gain0"];
+        this.lfo0gain0.addEventListener("change", this.ctrl_lfo0gain0.bind(this));
+
+        //var lfo0gain1=document.getElementById("knob-lfo0gain1");
+        this.lfo0gain1=this.$["knob-lfo0gain1"];
+        this.lfo0gain1.addEventListener("change", this.ctrl_lfo0gain0.bind(this));
+
+        //var vca0gain=document.getElementById("knob-vca0gain");
+        this.vca0gain=this.$["knob-vca0gain"];
+        this.vca0gain.addEventListener("change", this.ctrl_vca0gain.bind(this));
+
+        //var vco1detune=document.getElementById("knob-vco1detune");
+        this.vco1detune=this.$["knob-vco1detune"];
+        this.vco1detune.addEventListener("change", this.ctrl_vco1detune.bind(this));
+        this.vco1detune.addEventListener("dblclick", this.ctrl_detuneset0.bind(this));
+
+        //var vco0Type=document.getElementById("analyser-vco00");
+        this.vco0Type=this.$["analyser-vco00"];
+        this.vco0Type.addEventListener("click", function(event){
+            this.vcoType[0]=(this.vcoType[0]+1)%4;
+        });
+        //var vco1Type=document.getElementById("analyser-vco01");
+        this.vco1Type=this.$["analyser-vco01"];
+        this.vco1Type.addEventListener("click", function(event){
+            this.vcoType[1]=(this.vcoType[1]+1)%4;
+        });
+
+
+        // Web Audio 
+        this.ctxa=new AudioContext();
+        // // Synth
+        this.al0=this.$["p-vcf00"],
+        this.al1=this.$["p-vco00"],
+        this.al2=this.$["p-vco01"],
+        this.al3=this.$["p-lfo00"],
+        this.al4=this.$["p-vcf01"];
+        for(var i=21; i<109; i++) {
+            this.isPlaying[i]=false;
+        }
+        this.vca=this.ctxa.createGain();
+        //var velocityGain=[];
+    }
+
+});
+</script>
