@@ -7,7 +7,7 @@ select.select-preset {
   color:#000;
   overflow: hidden;
   outline: none;
-  font-size:15em; /*-webkit-small-control;*/
+  font-size:15px; /*-webkit-small-control;*/
   webkit-appearance: button;
   moz-appearance: button;
   appearance: button;
