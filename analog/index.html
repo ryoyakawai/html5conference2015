@@ -1,10 +1,18 @@
 <html>
   <head>
+    <meta charset="utf-8">
     <script src="./bower_components/webcomponentsjs/webcomponents.js"></script>
+    <meta property="og:url" content="https://ryoyakawai.github.io/html5conference2015/analog/index.html" />
+    <link rel="manifest" href="./manifest.json">
+    <meta property="og:title" content="Analog Synth" />
+    <meta property="og:image" content="https://ryoyakawai.github.io/html5conference2015/analog/images/analog-icon-512.png" />
+    <meta property="og:description" content="Analog Synth on the Web. Even works on offline!" />
+    <meta property="og:site_name" content="Analog Synth" />
     <link rel="import" href="./bower_components/x-webmidi/x-webmidirequestaccess.html">
     <link rel="import" href="./components/polymer_analyser.html">
     <link rel="import" href="./bower_components/webaudio-controls/lib/webaudio-controls.min.html">
     <link rel="stylesheet" type="text/css" href="./css/osc2-00.css">
+    <script type="text/javascript" src="./register_sw.js"></script>
   </head>
   <body>
     <x-webmidirequestaccess sysex="true" input="true" output="true"></x-webmidirequestaccess>

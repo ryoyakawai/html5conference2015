@@ -1,15 +1,13 @@
 {
+  "lang": "en",
   "name": "FM Synthesizer(1 Operator, 1 Carrier)",
-  "version": "1.0.2",
-  "manifest_version": 2,
-  "description": "Web Audio FM Synthesizer",
-  "app": {
-    "background": {
-      "scripts": ["js/background.js"]
-    }
-  },
-  "icons": {
-    "512" : "images/fm-icon-512.png"
-  },
-  "permissions": []
+  "short_name": "FM Synth",
+  "icons": [{
+        "src": "./images/fm-icon-512.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }],
+  "start_url": "https://ryoyakawai.github.io/html5conference2015/fm/index.html",
+  "display": "standalone"
+  "orientation": "landscape",
 }
