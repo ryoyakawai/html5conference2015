@@ -3,6 +3,7 @@ importScripts('serviceworker-cache-polyfill.js');
 var CACHE_NAME = 'html5conference2015-analog-cache';
 var urlsToCache = [
     './index.html',
+    './bower_components/webcomponentsjs/webcomponents.js',
     './bower_components/x-webmidi/x-webmidirequestaccess.html',
     './components/polymer_analyser.html',
     './bower_components/webaudio-controls/lib/webaudio-controls.min.html',
