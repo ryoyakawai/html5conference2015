@@ -3,8 +3,8 @@
   "name": "Analog Synthesizer(2 Oscillator)",
   "short_name": "Analog Synth",
   "icons": [{
-        "src": "./images/analog-icon-512.png",
-        "sizes": "512x512",
+        "src": "./images/analog-icon-144x144.png",
+        "sizes": "144x144",
         "type": "image/png"
       }],
   "start_url": "https://ryoyakawai.github.io/html5conference2015/analog/index.html",
