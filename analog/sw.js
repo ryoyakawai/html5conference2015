@@ -7,7 +7,6 @@ var urlsToCache = [
     './components/polymer_analyser.html',
     './bower_components/webaudio-controls/lib/webaudio-controls.min.html',
     './css/osc2-00.css',
-    './sw.js',
     './register_sw.js',
     './js/osc2-00.js'
 ];
