@@ -1,0 +1,331 @@
+<!DOCTYPE html><html><head>
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+<body><div hidden=""><polymer-element name="x-webmidiinput" assetpath="bower_components/x-webmidi/">
+  <template>
+    <style type="text/css">
+    .select-midiin {
+      font-family:arial;
+      color:#000;
+      overflow: hidden;
+      outline: none;
+      font-size:15px; /*-webkit-small-control;*/
+      -webkit-appearance: button;
+      -moz-appearance: button;
+      appearance: button;
+      -webkit-border-radius: 6px;
+      -moz-border-radius: 6px;
+      box-sizing: border-box;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      background:#fff url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGgAAABYCAYAAAAZZrIMAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3gwMDjIbBk010QAAASBJREFUeNrt2D0uRGEYhuGHiUShodQolFQq5dQUVqCyATuQsAW2IAobUFrBbGBKBeWUIn6akxAiM86cnw/XlUw/ee9zkpknAQAAAAAAAAAAAAAAAAAA/pSFgr7LTpLrQu/0kmSY5O6/PzD7SV4L/Gx7l98dFhZnKMlXx4XEOZDie2c9xzmSYLqLnuKcOP3svzKvOo5z7uw/M0hy21Gcy8L+evwaS0lGLce5SbLo1PUtJxm3FGdUPQTMaSXJfcNxxlV8GrKWZNJQnIckq07avPUkj3PGmVSxaclmkueacZ6SbDhh+3ZrBtpyuu7sxfhZvFkXcONnj6Yt4MbPApzG+Fm8zwu48bMwHxdw42ehBtWbNHAKAAAAAAAAAAAAAAAo3BvDPY/9X9SQowAAAABJRU5ErkJggg==") no-repeat right center;
+      background-size: 22px 24px;
+      cursor: pointer;
+      vertical-align: middle;
+      user-select: none; /* CSS3 */
+      -moz-user-select: none; /* Firefox */
+      -webkit-user-select: none; /* Safari、Chromeなど */
+
+      padding:5px 30px 5px 5px;
+      border-radius:2px;
+      border:0px solid #ddd;
+      margin:3px 3px;
+    }
+    </style>
+    <select class="select-midiin" id="midiin">
+      <option value="false">Not Selected</option>
+    </select>
+  </template>
+  <script type="text/javascript" src="bower_components/x-webmidi/js/input.js"></script>
+</polymer-element>
+
+<polymer-element name="x-webmidioutput" assetpath="bower_components/x-webmidi/">
+  <template>
+    <style type="text/css">
+    .select-midiout {
+      font-family:arial;
+      color:#000;
+      overflow: hidden;
+      outline: none;
+      font-size:15px; /*-webkit-small-control;*/
+      -webkit-appearance: button;
+      -moz-appearance: button;
+      appearance: button;
+      -webkit-border-radius: 6px;
+      -moz-border-radius: 6px;
+      box-sizing: border-box;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      background:#fff url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGgAAABYCAYAAAAZZrIMAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3gwMDjIbBk010QAAASBJREFUeNrt2D0uRGEYhuGHiUShodQolFQq5dQUVqCyATuQsAW2IAobUFrBbGBKBeWUIn6akxAiM86cnw/XlUw/ee9zkpknAQAAAAAAAAAAAAAAAAAA/pSFgr7LTpLrQu/0kmSY5O6/PzD7SV4L/Gx7l98dFhZnKMlXx4XEOZDie2c9xzmSYLqLnuKcOP3svzKvOo5z7uw/M0hy21Gcy8L+evwaS0lGLce5SbLo1PUtJxm3FGdUPQTMaSXJfcNxxlV8GrKWZNJQnIckq07avPUkj3PGmVSxaclmkueacZ6SbDhh+3ZrBtpyuu7sxfhZvFkXcONnj6Yt4MbPApzG+Fm8zwu48bMwHxdw42ehBtWbNHAKAAAAAAAAAAAAAAAo3BvDPY/9X9SQowAAAABJRU5ErkJggg==") no-repeat right center;
+      background-size: 22px 24px;
+      cursor: pointer;
+      vertical-align: middle;
+      user-select: none; /* CSS3 */
+      -moz-user-select: none; /* Firefox */
+      -webkit-user-select: none; /* Safari、Chromeなど */
+
+      padding:5px 30px 5px 5px;
+      border-radius:2px;
+      border:0px solid #ddd;
+      margin:3px 3px;
+    }
+    </style>
+    <select class="select-midiout" id="midiout">
+      <option value="false">Not Selected</option>
+    </select>
+  </template>
+  <script type="text/javascript" src="bower_components/x-webmidi/js/output.js"></script>
+</polymer-element>
+<polymer-element name="x-webmidirequestaccess" attributes="sysex input output" assetpath="bower_components/x-webmidi/">
+  <template>
+    <style type="text/css"></style>
+  </template>
+  <script type="text/javascript" src="bower_components/x-webmidi/js/request.js"></script>
+</polymer-element>
+
+<polymer-element name="polymer-analyser" attributes="offsety" assetpath="components/">
+  <template>
+    <style type="text/css"></style>
+  </template>
+  <script type="text/javascript" src="components/polymer_analyser.js"></script>
+</polymer-element>
+
+<polymer-element name="webaudio-knob" attributes="value defvalue min max step sprites diameter width height sensitivity src valuetip tooltip enable" on-mousedown="pointerdown" on-touchstart="pointerdown" assetpath="bower_components/webaudio-controls/">
+  <template>
+    <div class="wac-body" id="wac-body" touch-action="none">
+      <div id="wac-knob" touch-action="none"></div>
+      <span id="wac-value-tip">{{valuedisp}}</span>
+      <div id="wac-tooltip-box"><span id="wac-tooltip-text">{{tooltip}}</span></div>
+    </div>
+    <style>
+      :host {
+        display: inline-block;
+        font-family: sans-serif;
+        font-size: 11px;
+      }
+      #wac-body {
+        position:relative;
+      }
+      #wac-knob {
+        cursor: pointer;
+        width: 64px;
+        height: 64px;
+        background-repeat: no-repeat;
+        background-position: 0px 0px;
+      }
+      #wac-value-tip {
+        position: absolute;
+        top: -20px;
+        right: 0;
+        z-index: 10;
+        display: none;
+        opacity: 0;
+        border: solid 1px #666;
+        background-color: #fff;
+        color: #000;
+        border-radius: 4px;
+        padding: 3px 8px;
+        transition: opacity 0.3s;
+      }
+      #wac-tooltip-box {
+        position: absolute;
+        bottom: -24px;
+        left: 20px;
+        z-index: 10;
+        display: none;
+        opacity: 0;
+        width: 200px;
+        transition: opacity 0.5s;
+      }
+      #wac-tooltip-text {
+        display: inline-block;
+        border: solid 0px #666;
+        background-color: #fff;
+        color: #000;
+        border-radius: 5px;
+        padding: 5px;
+      }
+    </style>
+  </template>
+  
+</polymer-element>
+
+
+<polymer-element name="webaudio-slider" attributes="min max value defvalue step width height knobwidth knobheight ditchLength src knobsrc direction valuetip sensitivity tooltip enable" on-mousedown="pointerdown" on-touchstart="pointerdown" assetpath="bower_components/webaudio-controls/">
+  <template>
+    <div class="wac-body" id="wac-body">
+      <div id="wac-slibase" touch-action="none">
+        <div id="wac-sliknob"></div>
+      </div>
+      <span id="wac-value-tip">{{valuedisp}}</span>
+      <div id="wac-tooltip-box"><span id="wac-tooltip-text">{{tooltip}}</span></div>
+    </div>
+    <style>
+      :host {
+        display: inline-block;
+        font-family: sans-serif;
+        font-size: 11px;
+      }
+      #wac-body {
+        position: relative;
+      }
+      #wac-slibase {
+        cursor: pointer;
+        background: #000000;
+        position: relative;
+      }
+      #wac-sliknob {
+        background: #ff0000;
+        position: relative;
+      }
+      #wac-value-tip {
+        position: absolute;
+        top: -20px;
+        right: 0;
+        z-index: 10;
+        display: none;
+        opacity: 0;
+        border: solid 1px #666;
+        background-color: #fff;
+        color: #000;
+        border-radius: 4px;
+        padding: 3px 8px;
+        transition: opacity 0.3s;
+      }
+      #wac-tooltip-box {
+        position: absolute;
+        bottom: -24px;
+        left: 20px;
+        z-index: 10;
+        display: none;
+        opacity: 0;
+        width: 200px;
+        transition: opacity 0.5s;
+      }
+      #wac-tooltip-text {
+        display: inline-block;
+        border: solid 0px #666;
+        background-color: #fff;
+        color: #000;
+        border-radius: 5px;
+        padding: 5px;
+      }
+    </style>
+  </template>
+  
+</polymer-element>
+
+<polymer-element name="webaudio-switch" attributes="value defvalue type width height src group tooltip enable" on-mousedown="pointerdown" on-touchstart="pointerdown" assetpath="bower_components/webaudio-controls/">
+  <template>
+    <div class="wac-body" id="wac-body">
+      <div id="wac-switch"></div>
+      <div id="wac-tooltip-box"><span id="wac-tooltip-text">{{tooltip}}</span></div>
+    </div>
+    <style>
+      :host {
+        display: inline-block;
+        font-family: sans-serif;
+        font-size: 11px;
+      }
+      #wc-body {
+        position: relative;
+      }
+      #wac-switch {
+        cursor: pointer;
+        width: 64px;
+        height: 64px;
+        background-position: -64px;
+      }
+      #wac-tooltip-box {
+        position: absolute;
+        bottom: -24px;
+        left: 20px;
+        z-index: 10;
+        display: none;
+        opacity: 0;
+        width: 200px;
+        transition: opacity 0.5s;
+      }
+      #wac-tooltip-text {
+        display: inline-block;
+        border: solid 0px #666;
+        background-color: #fff;
+        color: #000;
+        border-radius: 5px;
+        padding: 5px;
+      }
+    </style>
+  </template>
+  
+</polymer-element>
+
+<polymer-element name="webaudio-param" attributes="value width height fontsize color src link" assetpath="bower_components/webaudio-controls/">
+  <template>
+    <input type="text" class="param" id="param" value="0">
+    <style>
+      :host {
+        display: inline-block;
+        font-family: sans-serif;
+      }
+      #param {
+        border: none;
+        cursor: pointer;
+        text-align: center;
+        position: relative;
+      }
+    </style>
+  </template>
+  
+</polymer-element>
+
+<polymer-element name="webaudio-keyboard" attributes="width height min keys colors enable" assetpath="bower_components/webaudio-controls/">
+  <template>
+    <div id="wac-body" touch-action="none"></div>
+    <style>
+      :host {
+        display: block;
+      }
+      #wac-canvas {
+        cursor: pointer;
+        width: 400px;
+        height: 60px;
+        background: #22f;
+      }
+    </style>
+  </template>
+  
+</polymer-element>
+
+</div>
+  <script src="bower_components/webcomponentsjs/webcomponents.js"></script>
+  <script type="text/javascript" src="bower_components/polymer/polymer.js"></script>
+
+
+
+  
+  
+  <x-webmidirequestaccess sysex="true" input="true" output="true"></x-webmidirequestaccess>
+
+  <div id="control-panel">
+    <div id="div-button-ps-text">PitchShift</div>
+    <div id="div-button-ps" class="button-size"><webaudio-switch id="switch-pitchshift" src="images/ProphetButton.png" value="0" height="128" width="85"></webaudio-switch></div>
+    <div id="div-button-dl-text">Delay</div>
+    <div id="div-button-dl" class="button-size"><webaudio-switch id="switch-delay" src="images/ProphetButton.png" value="0" height="128" width="85"></webaudio-switch></div>
+    <div id="div-button-dltype-text">Type</div>
+    <div id="div-button-direction"><webaudio-switch id="switch-delaydirection" src="images/switch_toggle.png" value="0" height="56" width="56"></webaudio-switch></div>
+    <div id="div-button-pitch-text">Pitch</div>
+    <div id="div-button-pitch"><webaudio-switch id="switch-togglepitch" src="images/switch_toggle.png" value="0" height="56" width="56"></webaudio-switch></div>
+    <div id="div-button-dltime-text">Time</div>
+    <div id="div-button-dltime"><webaudio-knob id="knob-delaytime" src="images/flatknob3.png" sprites="30" value="0.5" min="0" max="1" step="0.05" diameter="35"></webaudio-knob></div>
+    <div id="div-button-dlgain-text">Gain</div>
+    <div id="div-button-dlgain"><webaudio-knob id="knob-delaygain" src="images/flatknob3.png" sprites="30" value="0.5" min="0" max="0.8" step="0.05" diameter="35"></webaudio-knob></div>
+  </div>
+
+	<script type="text/javascript" src="js/dsp.js"></script>
+	<script type="text/javascript" src="js/pitchshifter.js"></script>
+	<script type="text/javascript" src="js/delayProcess.js"></script>
+  <script type="text/javascript" src="js/app.js"></script>
+
+
+
+<script charset="utf-8" src="build.js"></script></body></html>

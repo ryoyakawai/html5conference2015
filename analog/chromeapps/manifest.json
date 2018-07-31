@@ -1,0 +1,15 @@
+{
+  "name": "Analog Synthesizer(2 Oscillator)",
+  "version": "1.0.3",
+  "manifest_version": 2,
+  "description": "Web Audio Analog Synthesizer",
+  "app": {
+    "background": {
+      "scripts": ["js/background.js"]
+    }
+  },
+  "icons": {
+    "512" : "images/analog-icon-512.png"
+  },
+  "permissions": []
+}

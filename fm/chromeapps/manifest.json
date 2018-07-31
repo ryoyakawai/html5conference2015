@@ -1,0 +1,15 @@
+{
+  "name": "FM Synthesizer(1 Operator, 1 Carrier)",
+  "version": "1.0.3",
+  "manifest_version": 2,
+  "description": "Web Audio FM Synthesizer",
+  "app": {
+    "background": {
+      "scripts": ["js/background.js"]
+    }
+  },
+  "icons": {
+    "512" : "images/fm-icon-512.png"
+  },
+  "permissions": []
+}

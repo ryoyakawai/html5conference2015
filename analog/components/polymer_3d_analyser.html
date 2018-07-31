@@ -1,0 +1,121 @@
+<!--<script type="text/javascript" src="../bower_components/polymer/polymer.js"></script>-->
+<polymer-element name="polymer-analyser" attributes="displayareaname width height offsety">
+  <template>
+    <script type="text/javascript" src="./js/three.70.js"></script>
+    <script type="text/javascript" src="./js/controls/OrbitControls.js"></script>
+    <style type="text/css"></style>
+  </template>
+  <script>
+  Polymer({
+      timerId: false,
+      renderer: null,
+      canvas: null,
+      scene: null,
+      camera: null,
+      spotLight:null, light:null,
+      controls:null,
+      axes:null,
+      ready: function() {
+          if(typeof this.offsety=="undefined") {
+              this.offsety=0;
+          }
+          if(typeof this.width=="undefined") this.width=720;
+          if(typeof this.heighth=="undefined") this.width=500;
+
+          this.readyTimer=setInterval(function(){
+              if(typeof THREE=="function") {
+                 if(typeof THREE.OrbitControls=="function") {
+                      clearInterval(this.timerId);
+                      this.timerId=false;
+                      this.initRender();
+                      this.initScene();
+                      this.initCamera();
+                      this.initSpotLight();
+                      this.initLight();
+                      this.createFloor();
+                  }
+              }
+          }, 100);
+      },
+      initRender: function() {
+          this.render=new THREE.WebGLRenderer({antialias: true});
+          this.renderer.setSize(this.width, this.height);
+          this.renderer.shadowMapEnabled = true;
+          this.renderer.shadowMapSoft = true;
+
+          this.canvas=document.createElement("canvas");
+          this.canvas.width=cwidth;
+          this.canvas.height=cheight;
+          this.renderer.shadowMapEnabled=true;
+          this.renderer.shadowMapSoft=true;
+          this.renderer.setClearColor(0x333333, 1);
+
+          document.getElementById(displayareaname).appendChild(this.renderer.domElement);
+      },
+      initScene: function() {
+          this.scene = new THREE.Scene();
+          this.scene.fog = new THREE.FogExp2( 0xAA9966, 0.0007 );
+      },
+      initCamera: function() {
+        this.camera = new THREE.PerspectiveCamera(60, WIDTH/HEIGHT, 0.1, 1000);
+        //this.camera.position.set(400, 479, -410);
+        //this.camera.position.set(-245, 216, -270);
+        this.camera.position.set(-300, 600, -450);
+        this.scene.add(camera);
+      },
+      initSpotLight: function() {
+          this.spotLight = new THREE.SpotLight( 0xcccccc );
+          this.spotLight.position.set( 0, 5000, 0 );
+          this.scene.add(spotLight);
+      },
+      initLight: function() {
+          light = new THREE.DirectionalLight( 0xffffff, 1 );
+          light.position.set( -30, 200, -350 );
+          light.target.position.copy( scene.position );
+          light.castShadow = true;
+          light.shadowCameraRight = 350;
+          light.shadowCameraLeft = -350;
+          light.shadowCameraTop = 250;
+          light.shadowCameraBottom = -250;
+          light.shadowCameraNear = 720;
+          light.shadowCameraFar = 100;
+          light.shadowBias = -.0001
+          light.shadowMapWidth = light.shadowMapHeight = 100;//2048;;
+          light.shadowDarkness = .7;
+          light.shadowCameraVisible = false;//true;
+          scene.add( light );
+      },
+      initControls: function() {
+          this.controls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
+      },
+      createAxis: function() {
+        this.axes = new THREE.AxisHelper(100);
+        this.scene.add( this.axes );
+      },
+      createFloor: function() {
+          // floor
+          var oneWidth = 60, oneHeight = 60, wUnits = 11, hUnits = 11;
+          var groundGeo = new THREE.PlaneGeometry(oneWidth*wUnits, oneHeight*hUnits, wUnits, hUnits);
+          for(var i=0, len = groundGeo.faces.length, f=-1; i<len; i++){
+              f = -1;
+              if((i/wUnits | 0)%2==1){ f = ~f; }
+              if((i%wUnits)%2==1){ f = ~f; }
+              groundGeo.faces[i].materialIndex = f+1;
+          }
+          var ground = new THREE.Mesh(
+              groundGeo,
+              new THREE.MeshFaceMaterial([
+                  new THREE.MeshBasicMaterial({color: 0x999999, wireframe:true }),
+                  new THREE.MeshBasicMaterial({color: 0x4d4d4d, wireframe:true })
+              ])
+          );
+          ground.rotation.x = -Math.PI/2;
+          scene.add(ground);
+
+          render();
+      }
+
+  </script>
+</polymer-element>
+
+
